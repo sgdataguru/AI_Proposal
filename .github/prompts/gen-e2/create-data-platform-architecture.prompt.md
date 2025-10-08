@@ -4,42 +4,62 @@ You are an expert data platform architect tasked with designing a comprehensive 
 
 ## Architecture Design Deliverables
 
-Please provide the following:
+Create the following documentation files in the specified locations:
 
-### 1. High-Level Architecture Diagram
-- Logical architecture showing all major components
-- Data flow between components
-- Integration points with external systems
+### High-Level Architecture (docs/architecture/)
 
-### 2. Component Specifications
-For each component, detail:
-- Purpose and functionality
-- Technology choice and rationale
-- Scalability considerations
-- Cost implications
+**1. `docs/architecture/overview.md`**
+- Executive summary of the platform
+- High-level logical architecture diagram (using Mermaid or ASCII)
+- Major components and their relationships
+- Key design principles and architectural decisions
 
-### 3. Data Flow Design
+**2. `docs/architecture/data-flows.md`**
+- End-to-end data flow diagrams
 - Data ingestion patterns (batch, streaming, real-time)
-- Data transformation and processing pipeline
+- Data transformation and processing pipeline overview
 - Data storage strategy (hot, warm, cold storage)
 - Data access patterns and consumption layers
 
-### 4. Security & Governance
+**3. `docs/architecture/security-governance.md`**
 - Authentication and authorization approach
 - Data encryption (at rest and in transit)
-- Network security and isolation
-- Data governance and lineage
-- Compliance controls
+- Network security and isolation strategy
+- Data governance and lineage framework
+- Compliance controls and audit mechanisms
 
-### 5. Operational Considerations
+### Detailed Architecture (infra/docs/architecture/)
+
+**4. `infra/docs/architecture/component-specifications.md`**
+For each component, detail:
+- Purpose and functionality
+- Technology choice and rationale
+- Configuration requirements
+- Scalability considerations
+- Dependencies and integration points
+- Cost implications
+
+**5. `infra/docs/architecture/network-security.md`**
+- Network topology and isolation design
+- Virtual network configuration
+- Firewall rules and security groups
+- Private endpoints and service endpoints
+- DNS configuration
+- VPN/ExpressRoute integration (if applicable)
+
+**6. `infra/docs/architecture/operations.md`**
 - Monitoring and logging strategy
+- Alert configuration and incident response
 - Disaster recovery and backup approach
 - CI/CD pipeline design
 - Cost optimization strategies
 - Performance tuning recommendations
 
-### 6. Implementation Roadmap
-- Phased implementation plan
-- Critical path and dependencies
-- Resource requirements
-- Risk mitigation strategies
+## Instructions
+
+- Create each document as a separate markdown file in the specified location
+- Use clear headings and consistent formatting across all documents
+- Include diagrams where appropriate (use Mermaid syntax for diagrams)
+- Cross-reference related documents when needed
+- Ensure technical accuracy and completeness
+- Do not include timeline, roadmap, or implementation schedule information
