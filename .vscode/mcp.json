@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "Microsoft Fabric MCP": {
+      "command": "C:\\Users\\IanCarter\\mcp\\servers\\Fabric.Mcp.Server\\src\\bin\\Release\\fabmcp",
+      "args": ["server", "start", "--mode", "all"]
+    }
+  }
+}

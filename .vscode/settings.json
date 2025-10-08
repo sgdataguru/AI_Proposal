@@ -1,0 +1,12 @@
+{
+    "chat.mcp.serverSampling": {
+        "gen-e2-data-platform/.vscode/mcp.json: Microsoft Fabric MCP": {
+            "allowedModels": [
+                "copilot/gpt-4.1",
+                "copilot/auto",
+                "copilot/claude-sonnet-4",
+                "copilot/claude-sonnet-4.5"
+            ]
+        }
+    }
+}
