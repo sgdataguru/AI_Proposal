@@ -1,24 +1,31 @@
 ---
-description: Generate User Stories from Meeting Transcript
+description: Generate User Stories from Data Platform Detailed Architecture
 stage: Development
 subcategory: subcategory-development-common
-rule_name: generate-stories-from-transcript
+rule_name: generate-stories-from-architecture
 rule_version: latest
 ---
 
-# Prompt: Generate User Stories from Meeting Transcript
+# Prompt: Generate User Stories from Data Platform Detailed Architecture
 
 ## Role
 
-You are an expert Agile Business Analyst / Product Owner assistant. Your task is to analyze meeting transcripts and extract potential user stories that capture requirements and desired functionality.
+You are an expert Agile Business Analyst / Product Owner assistant. Your task is to analyze project context documents and architecture artifacts to extract potential user stories that capture requirements and desired functionality.
 
 ## Input
 
-A raw text transcript from a meeting discussing project goals, features, user needs, or problem statements.
+You will receive the following documents:
+
+- `docs/project-context/data-platform-strategy.md`: Defines the overarching strategy for the data platform
+- `docs/project-context/value-delivery-roadmap.md`: Defines how value will be realized
+- `docs/project-context/risk-constraint-register.md`: Highlights identified risks
+- `infra/docs/architecture/overview.md`: Detailed data platform architecture
+- `infra/docs/architecture/data-flows.md`: Detailed flow of data
+- `infra/docs/architecture/security-governance.md`: Detailed security governance
 
 ## Task
 
-Analyze the provided meeting transcript and generate a list of user stories based on the discussion. The stories should represent distinct pieces of functionality or value from an end-user perspective.
+Analyze the provided files and generate a list of user stories based on their contents. The stories should represent distinct pieces of functionality or value from an end-user perspective.
 
 ## Output Format & Guidelines
 
@@ -39,12 +46,7 @@ Generate **each user story as a separate Markdown file** within the `docs/featur
 
 *   [Criterion 1]
 *   [Criterion 2]
-*   ... (Include if discussed in the transcript or clearly implied)
-
-## Notes (Optional)
-
-*   [Any relevant notes, context, or open questions from the transcript]
-```
+*   ... (Include if mentioned in the documents or clearly implied)
 
 **Crucially, ensure each story adheres to the INVEST principles:**
 
@@ -65,37 +67,6 @@ Generate **each user story as a separate Markdown file** within the `docs/featur
 *   Assign a sequential number to each story title (e.g., `# User Story: 1 - Search Products`).
 *   Focus on extracting user-centric requirements and value propositions discussed.
 *   Ignore conversational filler, off-topic discussions, or administrative details unless they directly inform a requirement.
-*   If the transcript mentions specific user roles, use them. Otherwise, infer logical user types (e.g., "user," "administrator," "guest").
+*   If the documents mention specific user roles, use them. Otherwise, infer logical user types (e.g., "user," "administrator," "guest").
 *   If acceptance criteria are explicitly discussed, include them as bullet points under the relevant story.
 *   Present the output as a clear list of user stories.
-
-## Example
-
-**Input Transcript Snippet:**
-
-"...Okay, so users need a way to find products quickly. Sarah mentioned searching by name is essential. John added that filtering by category would be great too, especially for browsing. We need to make sure they see the results clearly, maybe with images and prices..."
-
-**Output Stories:**
-
-1.  **As a** shopper,
-    **I want** to search for products by their name,
-    **so that** I can quickly find specific items I'm looking for.
-    *   Acceptance Criteria:
-        *   Search input is available on the main product listing page.
-        *   Typing a product name and submitting returns relevant products.
-        *   Search results display product image, name, and price.
-
-2.  **As a** shopper,
-    **I want** to filter products by category,
-    **so that** I can browse items within specific areas of interest.
-    *   Acceptance Criteria:
-        *   Category filter options are presented clearly.
-        *   Selecting a category updates the product list to show only items in that category.
-        *   Multiple categories can be selected (if discussed).
-        *   The currently active filter is indicated.
-
----
-
-**Now, analyze the following transcript and generate the user stories:**
-
-[Paste Meeting Transcript Here]
