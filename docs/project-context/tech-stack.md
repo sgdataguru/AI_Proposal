@@ -15,3 +15,7 @@
 - Production and non-production environments
 - Multi-region deployment capability (US, EU, APAC)
 - Cost management and monitoring tools
+
+**Preference for Microsoft Fabric**
+- Modern architecture
+- Built for medallion architecture

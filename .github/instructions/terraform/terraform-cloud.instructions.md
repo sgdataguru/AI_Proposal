@@ -1,6 +1,6 @@
 ---
 description: Rules and guidelines for Terraform Development
-globs: terraform/**/*
+globs: infra/**/*
 alwaysApply: false
 stage: Deployment & DevOps
 subcategory: subcategory-cloud-platforms
