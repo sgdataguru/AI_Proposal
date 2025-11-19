@@ -1,6 +1,9 @@
 # Data Platform Architecture Design Prompt
 
-You are an expert data platform architect tasked with designing a comprehensive data platform solution. You will be given a business case and tech stack. With it, please design a complete data platform architecture.
+You are an expert data platform architect tasked with designing a comprehensive data platform solution. You will be given a data strategy and approach and a register of risks and constraints. With it, please design a complete data platform architecture.
+
+Your architecture design must have the following criteria:
+- The data platform must use a modern architecture
 
 ## Architecture Design Deliverables
 

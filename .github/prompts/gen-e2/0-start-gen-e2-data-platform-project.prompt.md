@@ -37,8 +37,10 @@ Here is the base project structure:
 │   ├── manage.sh -- Manages servers and services (start,stop,status)
 │   ├── setup.sh -- Installs project dependencies
 ├── docs/ -- Contains project documentation
+│   ├── admin/ -- Documentation regarding permissions required and granted for different services
 │   ├── architecture/ -- Architecture diagrams & docs
 │   ├── features/ -- Contains documentation for project features (one file per feature)
+│   ├── infra/ -- Contains an overview of the project
 │   ├── project-context/ -- Contains an overview of the project
 │   ├── index.md -- Main documentation file, indexing all other documentation
 │   └── CONTRIBUTE.md -- Describes the project structure and best practices for contributions
@@ -55,7 +57,7 @@ Here is the base project structure:
 │   ├── unit/
 │   ├── integration/
 │   └── e2e/
-├── infra/ -- Contains infrastructure code <refer to `terraform.cloud.md` for nested structure>
+├── infra/ -- Contains infrastructure code <refer to `terraform-cloud.instructions.md` for nested structure>
 └── DevOps/
     ├── pipeline/
     └── docs/

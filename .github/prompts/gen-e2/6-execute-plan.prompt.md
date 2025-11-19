@@ -144,6 +144,12 @@ The Structure Verification checklist MUST:
 - ✅ Column alignment matches design
 ```
 
+### Isolated Verification
+In the course of development, you MUST:
+- Generate quick, small tests that can be run to ensure a method works as intended
+- Include sufficient documentation of the quick test for your own future reference and lookup
+- Save these quick tests to `agent-utils/dev-testing/`
+
 ## Error Handling Requirements
 
 If implementation or verification fails, the output MUST:

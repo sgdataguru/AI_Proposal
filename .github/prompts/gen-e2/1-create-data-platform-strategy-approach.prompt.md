@@ -49,9 +49,14 @@ You have access to the following project context:
 
 ## Deliverables
 
-### 1. Data Platform Strategy & Approach Document
+You will create **three interconnected strategic documents** that together provide a complete strategic foundation for the data platform initiative. Each document should be comprehensive yet focused on its specific purpose.
 
-Create a comprehensive strategic document with the following structure:
+### 1. Data Platform Strategy
+**File:** `docs/project-context/data-platform-strategy.md`
+
+This is the primary strategic document that defines the "what" and "why" of the data platform.
+
+Create this document with the following structure:
 
 #### 1.1 Executive Summary
 - **Business Context**: Problem statement and current state recap (2-3 sentences)
@@ -118,37 +123,107 @@ Note: Keep this high-level. Specific services will be chosen during architecture
   - Consider: Version control, repeatability, and environment parity
   - Apply: Declarative infrastructure definitions (Terraform, ARM, Bicep)
 
-#### 1.5 Implementation Strategy & Phasing
-Recommend 2-4 phases that progressively build capability while delivering business value:
-- **Phase Name & Strategic Objectives**: What will be delivered and why
-- **Key Capabilities**: Features and capabilities included in this phase
-- **Business Value & Outcomes**: Specific measurable outcomes stakeholders will see
-- **Strategic Enablers**: What this phase enables for future phases
-- **Dependencies & Prerequisites**: What must be in place first
+---
 
-**Strategic Phasing Principles:**
+### 2. Value Delivery Roadmap
+**File:** `docs/project-context/value-delivery-roadmap.md`
+
+This document defines the strategic phasing and sequencing of value delivery - the "when" and "in what order".
+
+Create this document with the following structure:
+
+#### 2.1 Overview & Phasing Philosophy
+- Brief summary of the overall delivery strategy
+- Link to the main strategy document
+- Explanation of phasing principles being applied
+
+#### 2.2 Strategic Phasing Approach
+Articulate the core principles guiding the phasing:
 - **Value First**: Start with **high-value, low-complexity** use cases that prove platform value early (crawl-walk-run)
 - **End-to-End**: Deliver **working vertical slices** rather than horizontal infrastructure layers
 - **Foundation Early**: Include **observability, security, and governance** from Phase 1—technical debt is expensive
 - **Learn and Adapt**: Early phases validate assumptions and inform later phases
 - **Measurable Progress**: Each phase delivers **tangible business outcomes**, not just technical milestones
 
-Example:
+#### 2.3 Phase Definitions
+Recommend 2-4 phases that progressively build capability while delivering business value.
+
+For each phase, provide:
+- **Phase Name & Strategic Objectives**: What will be delivered and why
+- **Key Capabilities**: Features and capabilities included in this phase
+- **Business Value & Outcomes**: Specific measurable outcomes stakeholders will see (with metrics)
+- **Strategic Enablers**: What this phase enables for future phases
+- **Success Criteria**: How we'll know this phase is complete
+- **Dependencies & Prerequisites**: What must be in place before starting
+- **Estimated Timeline**: High-level timeframe (e.g., "Weeks 1-4", "Q1 2025")
+
+Example format:
 ```
-Phase 1: Foundation & Core Analytics (Weeks 1-4)
-- Objectives: Establish basic infrastructure, ingest core data sources
-- Capabilities: Product and sales reporting by country
-- Value: Answer "What are our top products by region?"
-- Prerequisites: Cloud environment setup, API access confirmed
+### Phase 1: Foundation & Core Analytics
+**Strategic Objectives**: Establish basic infrastructure and prove value with core analytics
+
+**Key Capabilities**:
+- Data ingestion from primary sources (Fake Store API, Exchange Rates API, REST Countries API)
+- Basic data warehouse with product and sales dimensions
+- Initial BI dashboards for product performance
+
+**Business Value & Outcomes**:
+- Answer critical business question: "What are our top products by region?"
+- Enable multi-currency revenue reporting
+- Reduce reporting time from 2-3 days to <5 minutes
+- KPI: 100% of product/sales data available for analysis
+
+**Strategic Enablers**:
+- Foundation for customer analytics (Phase 2)
+- Establishes data quality patterns
+- Proves cloud platform capabilities
+
+**Success Criteria**:
+- All 20 products ingested and refreshed daily
+- Sales data available across all 15+ countries
+- Finance team can generate revenue reports self-service
+
+**Dependencies & Prerequisites**:
+- Azure subscription provisioned
+- API access confirmed and tested
+- Development environment established
+
+**Estimated Timeline**: Weeks 1-6
 ```
 
-### 2. Risks and Mitigation Strategies
+#### 2.4 Cross-Phase Dependencies
+Document major dependencies between phases:
+- What must be completed in earlier phases for later phases to succeed
+- Key decision points that could alter the roadmap
+- Parallel work streams that could accelerate delivery
 
-Provide a risk register with:
+#### 2.5 Value Milestones
+Create a timeline view of key value milestones:
+- When specific business capabilities will be available
+- Major stakeholder demos or decision points
+- Go-live dates for self-service access
 
-| Risk ID | Risk Description | Likelihood | Impact | Mitigation Strategy | Owner Role |
-|---------|-----------------|------------|--------|---------------------|------------|
-| R-001 | Data source API rate limits | Medium | High | Implement caching layer... | Data Engineer |
+---
+
+### 3. Risk & Constraint Register
+**File:** `docs/project-context/risk-constraint-register.md`
+
+This document captures the risk landscape and boundary conditions for the strategy.
+
+Create this document with the following structure:
+
+#### 3.1 Overview
+- Purpose of this register
+- How risks will be monitored and managed
+- Link to main strategy document
+
+#### 3.2 Risk Register
+
+Create a comprehensive risk register in table format:
+
+| Risk ID | Risk Description | Likelihood | Impact | Mitigation Strategy | Owner Role | Phase Affected |
+|---------|-----------------|------------|--------|---------------------|------------|----------------|
+| R-001 | Data source API rate limits | Medium | High | Implement caching layer, request rate limiting | Data Engineer | Phase 1 |
 
 Include risks related to:
 - **Data quality and availability**: Source system reliability, data freshness, completeness
@@ -160,26 +235,61 @@ Include risks related to:
 - **Vendor lock-in**: Over-reliance on proprietary services, migration complexity
 - **Data drift**: Schema evolution, semantic changes in source systems
 
-### 3. Assumptions and Constraints
+For each risk, ensure:
+- Clear, specific description
+- Realistic likelihood (Low/Medium/High)
+- Business impact assessment (Low/Medium/High/Critical)
+- Actionable mitigation strategy
+- Clear ownership
+- Phase where risk is most relevant
 
-Clearly document:
+#### 3.3 Assumptions
 
-#### Assumptions
-- What you're assuming about project scope, resources, or environment
-- Data availability and quality assumptions
-- Skill and capability assumptions
-- Timeline assumptions
+Clearly document assumptions about:
+- **Project Scope**: What's included/excluded, boundaries
+- **Data Availability**: Source system availability, API stability, data quality
+- **Skills & Capabilities**: Team composition, skill levels, learning capacity
+- **Timeline**: Project duration, phase lengths, resource availability
+- **Technology**: Existing infrastructure, cloud access, tool availability
+- **Organization**: Stakeholder engagement, decision-making speed, change management
 
-#### Constraints
-- Known technical limitations
-- Budget or resource constraints (if mentioned)
-- Regulatory or compliance requirements
-- Timeline constraints
-- Existing technology constraints
+Format:
+```
+**A-001**: API sources remain stable and available throughout project duration
+**A-002**: Team has access to Azure subscription with appropriate permissions by Week 1
+**A-003**: Business stakeholders available for weekly demos and feedback sessions
+```
 
-### 4. Strategic Decision Framework
+#### 3.4 Constraints
 
-For major strategic decisions identified in the approach:
+Document known constraints that limit options or create boundaries:
+- **Technical**: Technology limitations, integration constraints, performance boundaries
+- **Budget**: Cost limitations, resource constraints (if mentioned)
+- **Regulatory**: Compliance requirements, data residency, privacy regulations
+- **Timeline**: Hard deadlines, market pressures, business cycles
+- **Organizational**: Existing technology standards, approval processes, change windows
+- **Resource**: Team size, skill availability, concurrent project demands
+
+Format:
+```
+**C-001**: Must use Microsoft Azure as cloud provider (existing enterprise agreement)
+**C-002**: Data must remain within EU for GDPR compliance
+**C-003**: Budget limited to infrastructure costs only; no software license purchases
+```
+
+#### 3.5 Risk Monitoring & Review
+- How often risks will be reviewed
+- Who is responsible for risk management
+- Escalation process for high-impact risks
+- Risk retirement criteria
+
+---
+
+## Strategic Decision Framework
+
+**Note**: This framework should be incorporated into **Document 1: Data Platform Strategy** as the final section (1.5).
+
+For major strategic decisions identified in the strategy, document:
 - **Decision Point**: What strategic choice needs to be made
 - **Options Considered**: 2-3 viable alternatives with pros/cons
 - **Recommended Strategy**: Your strategic recommendation
@@ -187,13 +297,36 @@ For major strategic decisions identified in the approach:
 - **Decision Timing**: What information or validation is needed before committing
 - **Reversibility**: How easily this decision can be changed later (one-way vs. two-way door)
 
-Example:
+Example format:
 ```
-Decision Point: Real-time vs. Batch Data Processing
-Options: (1) Real-time streaming, (2) Micro-batch (5-15 min), (3) Daily batch
-Recommended: Daily batch initially, with architecture allowing future streaming
-Criteria: Business requirement urgency, cost, complexity, data volumes
-When to Decide: After validating business requirements for data freshness
+### Decision D-001: Real-time vs. Batch Data Processing
+
+**Decision Point**: What data processing model should anchor the platform architecture?
+
+**Options Considered**:
+1. **Real-time streaming**: Event-driven, sub-second latency
+   - Pros: Immediate insights, supports real-time use cases
+   - Cons: High complexity, significant cost, requires specialized skills
+   
+2. **Micro-batch (5-15 min)**: Near-real-time processing
+   - Pros: Balances freshness with complexity, manageable costs
+   - Cons: Still complex, may not meet all requirements
+   
+3. **Daily batch**: Scheduled overnight processing
+   - Pros: Simple, cost-effective, matches current business needs
+   - Cons: No intraday insights, cannot support real-time use cases
+
+**Recommended Strategy**: Daily batch initially, with architecture that allows future streaming adoption
+
+**Decision Criteria**:
+- Business requirement for data freshness (current need: daily reporting)
+- Team skill level (SQL/BI skills vs. streaming engineering)
+- Cost constraints (batch is 3-5x less expensive)
+- Time to value (batch can be operational in weeks vs. months)
+
+**Decision Timing**: Confirm during Phase 1 after validating business requirements for data freshness with stakeholders
+
+**Reversibility**: Two-way door - Architecture can evolve to support streaming without full rewrite (medallion architecture supports both patterns)
 ```
 
 ## Strategic Principles to Guide Your Strategy
@@ -246,10 +379,41 @@ A high-quality Data Platform Strategy & Approach document should:
 
 ## Output Format
 
-Provide your response as a well-structured markdown document that can be saved as `docs/project-context/data-platform-strategy-approach.md` and serve as the authoritative strategic reference throughout the project lifecycle.
+Provide your response as **three separate, well-structured markdown documents**:
 
-This document should be:
-- **Comprehensive yet concise** - Cover all strategic elements without unnecessary detail
+1. **`docs/project-context/data-platform-strategy.md`** - Primary strategic document (3,000-4,000 words)
+2. **`docs/project-context/value-delivery-roadmap.md`** - Phasing and value delivery (1,500-2,500 words)
+3. **`docs/project-context/risk-constraint-register.md`** - Risk and constraints (1,000-1,500 words)
+
+### Document Requirements
+
+Each document should be:
+- **Comprehensive yet concise** - Cover all required elements without unnecessary detail
 - **Scannable** - Use clear headings, bullets, and tables for easy navigation
 - **Professional** - Written for technical and business stakeholders alike
 - **Referenceable** - Each section should stand alone and be easily cited in downstream documents
+- **Cross-linked** - Reference other documents where appropriate (e.g., "See Value Delivery Roadmap for phasing details")
+
+### Presentation Format
+
+Present your response as follows:
+
+```markdown
+# Document 1: Data Platform Strategy
+
+[Full content of data-platform-strategy.md]
+
+---
+
+# Document 2: Value Delivery Roadmap
+
+[Full content of value-delivery-roadmap.md]
+
+---
+
+# Document 3: Risk & Constraint Register
+
+[Full content of risk-constraint-register.md]
+```
+
+Each document should be complete and ready to save directly to its respective file path.
