@@ -1,7 +1,7 @@
 # Data Platform Strategy
 
 **Document Owner:** Data Platform Team  
-**Last Updated:** December 2024  
+**Last Updated:** December 2025  
 **Status:** Active  
 **Related Documents:** [Value Delivery Roadmap](./value-delivery-roadmap.md) | [Risk & Constraint Register](./risk-constraint-register.md)
 
