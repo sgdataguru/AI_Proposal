@@ -194,10 +194,11 @@ async function testAPICall(params) {
     };
 
     console.log('   📤 Sending request to Gamma API...');
+    console.log(`   🔑 Using API key: ${apiKey.substring(0, 8)}...`);
     const response = await fetch(GAMMA_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey.substring(0, 8)}...`, // Mask API key in logs
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(apiPayload),

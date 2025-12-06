@@ -7,8 +7,7 @@ This document provides evidence and instructions for testing the Gamma MCP Serve
 ## Test Files
 
 1. **test-10-params.mjs** - Comprehensive end-to-end test suite
-2. **test-issue-payload.mjs** - Tests the exact payload from the GitHub issue
-3. **test-validation.mjs** - Original validation tests (existing)
+2. **test-validation.mjs** - Original validation tests (existing)
 
 ## Prerequisites
 
@@ -49,15 +48,15 @@ This test validates:
 - If GAMMA_API_KEY is not configured, API test is skipped (this is expected)
 - Total: 13 passed, 0 failed
 
-### Test 2: Issue Payload Validation
+### Test 2: Original Validation Tests
 
 ```bash
-node test-issue-payload.mjs
+node test-validation.mjs
 ```
 
-This test uses the EXACT payload from the GitHub issue and demonstrates that invalid enum values are properly rejected.
+This runs the original parameter validation tests (10 tests).
 
-**Expected Result**: Validation fails with clear error messages for each invalid enum value
+**Expected Result**: All 10 validation tests pass
 
 ### Test 3: Start the Server
 
