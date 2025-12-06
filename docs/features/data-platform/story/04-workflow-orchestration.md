@@ -88,3 +88,48 @@ As a **Data Engineer**, I want to set up Amazon MWAA (Managed Airflow) for workf
 - [Architecture Overview](../../../architecture/overview.md)
 - [Data Platform Strategy - Orchestration](../../../architecture/data-platform-strategy.md)
 - [Operations Guide](../../../../infra/docs/architecture/operations.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements the orchestration layer supporting all data and ML workflows per [Data Platform Strategy §4.1](../../../architecture/data-platform-strategy.md). MWAA (Managed Airflow) was selected per Decision 5 for its open-source foundation, managed infrastructure, rich ecosystem, and team familiarity.
+
+### Architecture Context
+- **Orchestration Layer**: MWAA manages ETL pipelines, ML workflows, and integration jobs per [Architecture Overview §2.2](../../../architecture/overview.md)
+- **Multi-step Workflows**: Coordinates Glue ETL → Feature Engineering → SageMaker Pipelines → Score Delivery per [Data Flows §2.2](../../../architecture/data-flows.md)
+- **Integration with ML**: Triggers SageMaker Batch Transform for daily scoring per [Architecture Overview §6.1](../../../architecture/overview.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** foundation, supports "Integration & Pilot Launch" (Weeks 8-10) per [Value Delivery Roadmap](../../../architecture/value-delivery-roadmap.md)
+- Target: >99% DAG success rate, >95% SLA adherence
+- Critical for achieving "Scores available by 6 AM daily" SLA
+
+### Key Risks & Constraints
+- **R04 (High)**: Timeline pressure - MWAA setup required early to support pipeline testing ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **C03**: Production systems require VPC isolation - MWAA must run in private subnets
+- **C04**: All infrastructure defined as Terraform code
+- DAG code version-controlled in Git, synced to S3
+
+### Platform Health Metrics
+Per [Data Platform Strategy §6.1](../../../architecture/data-platform-strategy.md):
+| Metric | Target |
+|--------|--------|
+| Data pipeline success rate | >99% |
+| Data freshness SLA adherence | >95% |
+| Mean time to recover (MTTR) | <4 hours |
+
+### Orchestration Decision Rationale
+Per [Data Platform Strategy Decision 5](../../../architecture/data-platform-strategy.md):
+- **Selected**: Amazon MWAA (Managed Airflow)
+- **Pros**: Open-source based, managed infrastructure, rich ecosystem, team familiarity
+- **Cons**: Higher cost than Step Functions for simple workflows
+- **Reversibility**: Medium - DAG code portable to other Airflow deployments
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon MWAA** for multi-step pipeline orchestration
+- **AWS Step Functions** as lightweight alternative for deterministic workflows
+- **Amazon CloudWatch** for Airflow metrics export
+- **Amazon SNS** for task failure alerts
+- **Amazon S3** for DAG storage and plugins
+- **Terraform** for infrastructure as code

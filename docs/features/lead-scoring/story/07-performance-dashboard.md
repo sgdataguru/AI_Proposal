@@ -90,3 +90,43 @@ As a **Sales Manager**, I want a dashboard showing lead score distribution, conv
 - [Architecture Overview - Analytics](../../../architecture/overview.md)
 - [Value Delivery Roadmap - Success Criteria](../../../architecture/value-delivery-roadmap.md)
 - [Tech Stack - QuickSight](../../../project-context/tech-stack.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story enables measurement of **REQ-001: Lead Prioritisation Intelligence** success criteria per [Business Case](../../../project-context/business-case.md). The dashboard supports the "Closed-Loop Learning System" (REQ-002) by systematically tracking lead outcomes and feeding performance insights back into strategy.
+
+### Architecture Context
+- **Analytics Layer**: Dashboard queries Gold zone via Amazon Athena per [Data Flows §6](../../../architecture/data-flows.md)
+- **BI Platform**: Amazon QuickSight for dashboards with Athena as data source per [Architecture Overview §2.2](../../../architecture/overview.md)
+- **Consumption Pattern**: Self-service access to governed datasets per [Data Platform Strategy §4.4](../../../architecture/data-platform-strategy.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Measurement, Optimization & Scale Blueprint" (Weeks 10-12) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M6: Phase 1 Go-Live** (Week 12) - Performance dashboard operational
+- Dashboard enables Week 5 PoC report: "Uplift signals, Governance artefacts, Recommendation for Phase 1 production rollout"
+
+### Success Metrics Alignment
+Per [Value Delivery Roadmap §3.1.3](../../../architecture/value-delivery-roadmap.md), the dashboard tracks:
+- Lead conversion improvement: 15-25% uplift for Hot leads vs. baseline
+- RM productivity: 20-30% more leads processed/day
+- Time-to-prioritization: Reduce from manual (days) to automated (daily)
+- Governance compliance: 100% auditability of scoring decisions
+
+### Key Risks & Constraints
+- **R04 (High)**: Insufficient time for full uplift measurement - dashboard should track leading indicators (contact rate, meeting bookings) alongside lagging metrics ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **A11**: Assumes conversion improvement will be measurable within 3-6 months - define leading indicators alongside lagging metrics
+- Dashboard must support A/B comparison for pilot cohort vs. non-scored leads
+
+### Observability Stack
+Per [Data Platform Strategy §3.6](../../../architecture/data-platform-strategy.md):
+- **Pipeline Monitoring**: Amazon CloudWatch (logs, metrics, alarms)
+- **Data Quality Dashboards**: Amazon QuickSight
+- **Model Performance**: SageMaker Model Monitor metrics integration
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon QuickSight** for PoC dashboards (lead volume, score distribution, activation indicators)
+- **Amazon Athena** for ad-hoc queries against Gold zone
+- **AWS Glue Data Catalog** for table metadata and schema documentation
+- **Amazon CloudWatch** for operational metrics (pipeline health, data freshness)

@@ -87,3 +87,46 @@ As a **Platform Administrator**, I want to configure AWS Lake Formation with fin
 - [Security & Governance Architecture](../../../architecture/security-governance.md)
 - [Data Platform Strategy - Governance](../../../architecture/data-platform-strategy.md#37-security-compliance--governance)
 - [Network Security Details](../../../../infra/docs/architecture/network-security.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements the **Data Governance** pillar of the three-pillar AI Governance approach per [Business Case](../../../project-context/business-case.md). Lake Formation access control is foundational to Strategic Bet #1: "Prioritize curated, governed analytics over raw data exploration in Phase 1" - ensuring data quality, building trust, and reducing risk of misinterpretation.
+
+### Architecture Context
+- **Governance Framework**: Lake Formation serves as the central data governance layer per [Architecture Overview §3.4](../../../architecture/overview.md)
+- **Access Control Model**: Fine-grained permissions at table and column level with data classification tags per [Security & Governance §2.5](../../../architecture/security-governance.md)
+- **RBAC Implementation**: Role-based access for DataScientist, DataEngineer, Analyst, and Service roles
+
+### Timeline & Milestones
+- Part of **Phase 1 Foundation** (Weeks 1-12) - core to "Data Platform Foundation Setup" (Weeks 2-4) per [Value Delivery Roadmap](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M2: Platform Foundation** (Week 4) - Governance framework active
+- Success criteria: 100% buckets under Lake Formation control, Zero unauthorized access incidents
+
+### Key Risks & Constraints
+- **R07 (Medium)**: Data breach or unauthorized access risk - Lake Formation fine-grained access controls are primary mitigation ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **C10**: PII data handling must comply with Indian data protection regulations - encryption, access controls, audit logging required
+- **C13**: Access to production data requires formal approval process
+- **A01**: Assumes Nuvama will provide data access within first two weeks
+
+### Data Classification
+Per [Security & Governance §5.3](../../../architecture/security-governance.md):
+- **Restricted**: PII fields (customer names, contact info) - enhanced controls, masking
+- **Confidential**: Lead data, scores, features - encryption, access control
+- **Internal**: Aggregated reports, dashboards - access logging
+
+### Permission Matrix
+Per [Security & Governance §2.5](../../../architecture/security-governance.md):
+| Principal | Database | Operations |
+|-----------|----------|------------|
+| DataScientistRole | curated, analytics | SELECT |
+| DataEngineerRole | All | ALL |
+| AnalystRole | analytics | SELECT (non-PII) |
+| ServiceRole | analytics (lead_scores) | SELECT |
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **AWS Lake Formation** for fine-grained access controls
+- **AWS Glue Data Catalog** for metadata management and classification tags
+- **AWS IAM** for role-based access control
+- **AWS CloudTrail** for audit logging of all access attempts

@@ -91,3 +91,46 @@ As a **Data Steward**, I want automated data quality monitoring across all data 
 - [Data Platform Strategy - Data Quality](../../../architecture/data-platform-strategy.md#35-data-quality-controls)
 - [Security & Governance - Quality Governance](../../../architecture/security-governance.md)
 - [Risk Register - Data Quality Risks](../../../architecture/risk-constraint-register.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements Strategic Bet #3: "Embed data quality and observability from inception" per [Data Platform Strategy](../../../architecture/data-platform-strategy.md). Proactive data quality monitoring prevents technical debt accumulation and establishes trust in AI outputs from the first deployment.
+
+### Architecture Context
+- **Quality Framework**: Implements the Data Quality Framework from [Data Platform Strategy §3.5](../../../architecture/data-platform-strategy.md) covering Completeness, Uniqueness, Validity, Accuracy, Timeliness, and Consistency
+- **Quality Scoring**: Per-dataset quality scores tracked and alerted on threshold breaches
+- **Observability Stack**: CloudWatch for pipeline monitoring, QuickSight for data quality dashboards per [Data Platform Strategy §3.6](../../../architecture/data-platform-strategy.md)
+
+### Timeline & Milestones
+- Part of **Phase 1 Foundation** (Weeks 1-12) - quality monitoring established during "Data Prep & Feature Build" (Weeks 3-5) per [Value Delivery Roadmap](../../../architecture/value-delivery-roadmap.md)
+- Supports Platform Health Metric: Data quality score >95% (weekly measurement)
+
+### Key Risks & Constraints
+- **R01 (Critical)**: Historical lead data quality gaps - this story provides the monitoring framework to identify and track quality issues ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **A17**: Data quality assumed sufficient for meaningful model training - quality monitoring validates this assumption
+- Quality checks must not significantly impact pipeline performance (constraint from ETL framework)
+
+### Quality Dimensions & Thresholds
+Per [Data Platform Strategy §3.5](../../../architecture/data-platform-strategy.md):
+| Dimension | Check Type | Threshold | Action |
+|-----------|-----------|-----------|--------|
+| Completeness | Null/missing counts | >5% | Alert + quarantine |
+| Uniqueness | Duplicate detection | Any | Deduplicate + log |
+| Validity | Schema conformance | Any mismatch | Reject record |
+| Accuracy | Business rule validation | Per-rule | Flag for review |
+| Timeliness | Data freshness | >6 hours stale | Alert operations |
+| Consistency | Cross-source reconciliation | >1% variance | Investigation trigger |
+
+### Key Risk Indicators (KRIs)
+Per [Risk Register §5.4](../../../architecture/risk-constraint-register.md):
+- Data quality score <90% → Escalate to Data Lead
+- Model accuracy decline >5% from baseline → Trigger retraining review
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **AWS Glue Data Quality** for automated rule execution
+- **Amazon CloudWatch** for metrics, alarms, and dashboards
+- **Amazon SNS** for quality alert notifications
+- **Amazon QuickSight** for quality dashboards and trend visualization
+- **Amazon Athena** for quality metrics analysis
