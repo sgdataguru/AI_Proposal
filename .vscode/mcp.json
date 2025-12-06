@@ -5,7 +5,6 @@
       "args": ["server", "start", "--mode", "all"]
     },
     "Gamma Presentation Generator": {
-      "comment": "Example configuration for Gamma MCP Server (uncomment and adjust paths)",
       "command": "npx",
       "args": [
         "tsx",
