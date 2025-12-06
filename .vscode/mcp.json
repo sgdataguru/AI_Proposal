@@ -3,6 +3,17 @@
     "Microsoft Fabric MCP": {
       "command": "C:\\Users\\IanCarter\\mcp\\servers\\Fabric.Mcp.Server\\src\\bin\\Release\\fabmcp",
       "args": ["server", "start", "--mode", "all"]
+    },
+    "Gamma Presentation Generator": {
+      "comment": "Example configuration for Gamma MCP Server (uncomment and adjust paths)",
+      "command": "npx",
+      "args": [
+        "tsx",
+        "/absolute/path/to/AI_Proposal/gamma-mcp-server/src/index.ts"
+      ],
+      "env": {
+        "GAMMA_API_KEY": "your_gamma_api_key_here"
+      }
     }
   }
 }
