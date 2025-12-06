@@ -24,7 +24,9 @@ dotenv.config();
 // Gamma API endpoint
 const GAMMA_API_URL = "https://api.gamma.app/api/v1/generate";
 
-// Copy of the schema from gamma-mcp-server/src/index.ts
+// Schema for tool parameters - duplicated from src/index.ts for test independence
+// NOTE: This duplication is intentional to allow running tests without building TypeScript
+// If schema changes in src/index.ts, this must be updated to match
 const GeneratePresentationSchema = z.object({
   inputText: z.string().min(1, "Input text is required"),
   tone: z.enum(["professional", "casual", "enthusiastic", "informative"]).optional(),
@@ -194,11 +196,12 @@ async function testAPICall(params) {
     };
 
     console.log('   📤 Sending request to Gamma API...');
+    // Security: Log masked API key for debugging while keeping actual key secure in logs
     console.log(`   🔑 Using API key: ${apiKey.substring(0, 8)}...`);
     const response = await fetch(GAMMA_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${apiKey}`, // Full key used for actual API request
         "Content-Type": "application/json",
       },
       body: JSON.stringify(apiPayload),
