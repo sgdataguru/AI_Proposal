@@ -500,6 +500,11 @@ resource "aws_s3_bucket_replication_configuration" "data_lake" {
 }
 
 # Lifecycle for Long-term Archive
+# Define retention periods as local values for clarity
+locals {
+  retention_days_7_years = 7 * 365  # 2555 days - regulatory compliance
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
   
@@ -522,7 +527,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
     }
     
     expiration {
-      days = 2555  # 7 years
+      days = local.retention_days_7_years  # 7 years for regulatory compliance
     }
   }
   
@@ -540,7 +545,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
     }
     
     expiration {
-      days = 2555  # 7 years for compliance
+      days = local.retention_days_7_years  # 7 years for regulatory compliance
     }
   }
 }

@@ -467,19 +467,22 @@ resource "aws_security_group" "endpoints" {
 #### EMR Security Groups
 
 ```hcl
+# Note: Bastion security group should be defined separately if SSH access is required
+# resource "aws_security_group" "bastion" { ... }
+
 resource "aws_security_group" "emr_master" {
   name        = "data-platform-emr-master-${var.environment}"
   description = "Security group for EMR master node"
   vpc_id      = aws_vpc.data_platform.id
   
-  # SSH from bastion (if needed)
-  ingress {
-    description     = "SSH from bastion"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
-  }
+  # SSH from bastion (if needed - uncomment when bastion is configured)
+  # ingress {
+  #   description     = "SSH from bastion"
+  #   from_port       = 22
+  #   to_port         = 22
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.bastion.id]
+  # }
   
   # Communication from core nodes
   ingress {

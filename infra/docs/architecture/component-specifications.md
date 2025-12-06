@@ -62,6 +62,8 @@ resource "aws_s3_bucket_versioning" "data_lake" {
 }
 
 # Server-side encryption
+# Note: aws_kms_key.data_platform should be defined before this resource
+# See Security Components section for KMS key definition
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
   
