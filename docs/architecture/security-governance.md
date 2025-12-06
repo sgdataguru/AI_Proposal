@@ -1,7 +1,7 @@
 # Security and Governance Architecture
 
 **Document Owner:** Security & Governance Team  
-**Last Updated:** December 2024  
+**Last Updated:** December 2025  
 **Status:** Active  
 **Related Documents:** [Architecture Overview](./overview.md) | [Data Flows](./data-flows.md) | [Network Security Details](../../infra/docs/architecture/network-security.md)
 
