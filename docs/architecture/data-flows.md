@@ -1,7 +1,7 @@
 # Data Flows Architecture
 
 **Document Owner:** Data Platform Team  
-**Last Updated:** December 2024  
+**Last Updated:** December 2025  
 **Status:** Active  
 **Related Documents:** [Architecture Overview](./overview.md) | [Security & Governance](./security-governance.md) | [Data Platform Strategy](./data-platform-strategy.md)
 
