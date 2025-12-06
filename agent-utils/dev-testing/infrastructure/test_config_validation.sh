@@ -55,7 +55,8 @@ if [ -f "$PROJECT_ROOT/docker-compose.yml" ]; then
     run_test "Docker Compose file is valid YAML" \
         "python3 -c 'import yaml; yaml.safe_load(open(\"$PROJECT_ROOT/docker-compose.yml\"))' 2>/dev/null"
 else
-    echo "Test $((test_count + 1)): Docker Compose file exists"
+    test_count=$((test_count + 1))
+    echo "Test $test_count: Docker Compose file exists"
     echo -e "  ${YELLOW}⊘ SKIP (file not found)${NC}"
     echo ""
 fi
@@ -79,7 +80,8 @@ if find "$PROJECT_ROOT/infra" -name "*.json" 2>/dev/null | grep -q .; then
     run_test "JSON configuration files are valid" \
         "find '$PROJECT_ROOT/infra' -name '*.json' -exec python3 -m json.tool {} \\; > /dev/null 2>&1"
 else
-    echo "Test $((test_count + 1)): JSON files are valid"
+    test_count=$((test_count + 1))
+    echo "Test $test_count: JSON files are valid"
     echo -e "  ${YELLOW}⊘ SKIP (no JSON files found)${NC}"
     echo ""
 fi

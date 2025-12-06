@@ -102,18 +102,19 @@ class DataService:
                 groups[key] = {
                     'count': 0,
                     'total_score': 0,
-                    'min_score': float('inf'),
-                    'max_score': float('-inf')
+                    'scores': []  # Track all scores for min/max
                 }
             
             groups[key]['count'] += 1
             groups[key]['total_score'] += lead['score']
-            groups[key]['min_score'] = min(groups[key]['min_score'], lead['score'])
-            groups[key]['max_score'] = max(groups[key]['max_score'], lead['score'])
+            groups[key]['scores'].append(lead['score'])
         
-        # Calculate averages
+        # Calculate averages and min/max
         for key in groups:
             groups[key]['avg_score'] = groups[key]['total_score'] / groups[key]['count']
+            groups[key]['min_score'] = min(groups[key]['scores'])
+            groups[key]['max_score'] = max(groups[key]['scores'])
+            del groups[key]['scores']  # Remove intermediate data
         
         return groups
 

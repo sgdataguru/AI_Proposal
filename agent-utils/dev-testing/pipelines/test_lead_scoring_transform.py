@@ -59,6 +59,12 @@ def categorize_lead(score):
 
 def transform_lead_data(raw_lead):
     """Transform raw lead data into scored lead record."""
+    # Validate required fields
+    if 'lead_id' not in raw_lead:
+        raise ValueError("lead_id is required")
+    if 'email' not in raw_lead:
+        raise ValueError("email is required")
+    
     score = calculate_lead_score(raw_lead)
     category = categorize_lead(score)
     
