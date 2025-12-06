@@ -94,3 +94,37 @@ As a **Relationship Manager**, I want lead scores and priority bands delivered t
 - [Data Flows Architecture](../../../architecture/data-flows.md)
 - [Architecture Overview - Integration](../../../architecture/overview.md)
 - [Business Case - Integration Path](../../../project-context/business-case.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story delivers the final step of **REQ-001: Lead Prioritisation Intelligence** - getting scores into the hands of RMs and sales teams. Per [Business Case](../../../project-context/business-case.md), one integration endpoint (CRM priority view OR daily activation list OR campaign audience segment) must be agreed early to enable value realization.
+
+### Architecture Context
+- **Integration Pattern**: CRM Integration follows the score delivery flow in [Data Flows §6.4](../../../architecture/data-flows.md): Gold Zone → Lambda → API Gateway → CRM System
+- **Phased Approach**: Phase 1 uses CSV/flat-file integration; Phase 2 adds API-based real-time push per [Architecture Overview §3.5](../../../architecture/overview.md)
+- **API Design**: RESTful APIs via API Gateway + Lambda for system integration per [Data Platform Strategy §4.3](../../../architecture/data-platform-strategy.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Integration & Pilot Launch" (Weeks 8-10) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M5: Integration Live** (Week 9) - CRM integration active with sales teams using priority lists
+- Success criteria: >80% RM adoption of priority lists
+
+### Key Risks & Constraints
+- **R03 (High)**: CRM integration delays block value realization - mitigate by starting with secure CSV/flat-file integration for PoC, parallel track API development ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **R05 (High)**: Low frontline adoption of AI-generated prioritization - co-design priority bands with RMs, keep UI simple, provide training
+- **R14 (High)**: External system owners may not prioritize integration work - early stakeholder engagement, executive sponsorship
+- **C17**: CRM system changes require coordination with IT operations
+
+### Integration Targets
+Per [Architecture Overview §3.5](../../../architecture/overview.md), initial integration points for Phase 1:
+- **CRM**: Priority view / API push
+- **Inside Sales Tools**: Daily activation list (CSV/API)
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon API Gateway + AWS Lambda** for API-based CRM ingestion
+- **SFTP/secure file delivery** for CSV-based integration in early phases
+- **AWS Secrets Manager** for CRM credential storage
+- **Amazon S3** for secure file exchange
+- **Amazon CloudWatch** for delivery monitoring and alerting

@@ -93,3 +93,49 @@ As a **Security Engineer**, I want to configure AWS KMS for encryption key manag
 - [Security & Governance - Encryption](../../../architecture/security-governance.md)
 - [Data Platform Strategy - Security](../../../architecture/data-platform-strategy.md#37-security-compliance--governance)
 - [Network Security Details](../../../../infra/docs/architecture/network-security.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements the "Encryption Everywhere" security principle per [Security & Governance §1.1](../../../architecture/security-governance.md). KMS encryption enables compliance with Indian data protection regulations and financial services audit requirements.
+
+### Architecture Context
+- **Encryption Architecture**: Customer Managed Keys (CMK) per environment with key hierarchy per [Security & Governance §3.1](../../../architecture/security-governance.md)
+- **Encryption at Rest**: SSE-KMS for S3, Glue Catalog, SageMaker, CloudWatch Logs per [Security & Governance §3.2](../../../architecture/security-governance.md)
+- **Encryption in Transit**: TLS 1.2+ for all communications per [Security & Governance §3.3](../../../architecture/security-governance.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** foundation infrastructure (Weeks 2-4) per [Value Delivery Roadmap](../../../architecture/value-delivery-roadmap.md)
+- Required before any data is stored in the platform
+- Target: 100% data encrypted at rest and in transit
+
+### Key Risks & Constraints
+- **R07 (Medium)**: Data breach risk - KMS encryption is primary mitigation for data at rest ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **C10**: PII data handling must comply with Indian data protection regulations
+- **C02**: Keys must reside in AWS Mumbai region (ap-south-1)
+- Key deletion requires 7-30 day waiting period (AWS constraint)
+
+### Encryption Coverage
+Per [Security & Governance §3.2](../../../architecture/security-governance.md):
+| Service | Encryption Method | Key Type | Rotation |
+|---------|-------------------|----------|----------|
+| S3 | SSE-KMS with bucket keys | Customer Managed | Annual |
+| Glue Data Catalog | KMS encryption | Customer Managed | Annual |
+| SageMaker | KMS for volumes/artifacts | Customer Managed | Annual |
+| CloudWatch Logs | KMS encryption | Customer Managed | Annual |
+| Secrets Manager | KMS encryption | AWS Managed | Automatic |
+
+### Key Policy Principles
+Per [Security & Governance §3.4](../../../architecture/security-governance.md):
+- Separate keys per environment (dev, uat, prod)
+- Key administrators cannot use keys
+- Key users cannot administer keys
+- Cross-account access via grants (not policies)
+- All key usage logged in CloudTrail
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **AWS KMS** with Customer Managed Keys
+- **AWS CloudTrail** for key usage audit logging
+- **Terraform** for key and policy management as code
+- TLS 1.2+ enforced on all S3 bucket policies

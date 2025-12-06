@@ -89,3 +89,38 @@ As an **Operations Manager**, I want lead scores to be generated automatically o
 - [Architecture Overview - ML Platform](../../../architecture/overview.md)
 - [Data Flows Architecture](../../../architecture/data-flows.md)
 - [Value Delivery Roadmap - Phase 1](../../../architecture/value-delivery-roadmap.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story operationalizes **REQ-001: Lead Prioritisation Intelligence** by delivering daily automated scoring to frontline teams. The batch scoring pipeline implements the "Minimum Viable AI Product" stage from the [Business Case](../../../project-context/business-case.md): "Scheduled batch scoring, CRM integration, Basic dashboard."
+
+### Architecture Context
+- **Daily Lead Scoring Pipeline**: Follows the sequence diagram in [Architecture Overview §6.1](../../../architecture/overview.md): Features → SageMaker Batch Transform → Gold Zone → API Gateway → CRM
+- **Batch-First Strategy**: Per [Data Platform Strategy §3.3](../../../architecture/data-platform-strategy.md), batch processing meets initial business SLAs with lower complexity
+- **Score Storage**: Outputs to Gold zone at `s3://bucket/analytics/lead_scores/` per [Data Flows §5.3](../../../architecture/data-flows.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Integration & Pilot Launch" (Weeks 8-10) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M5: Integration Live** (Week 9) - Scoring pipeline operational
+- SLA: Scores available by 6 AM daily (data freshness requirement per Strategy §1.3)
+
+### Key Risks & Constraints
+- **R04 (High)**: Insufficient time for full uplift measurement - track leading indicators (contact rate, meeting bookings) during pilot ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **R11 (High)**: Model performance degradation over time - implement score distribution monitoring as early warning
+- **C14**: Phase 1 PoC must demonstrate value within 5 weeks - scoring pipeline is critical path
+- **C15**: Production launch targeted within 12 weeks - pipeline reliability >99% required
+
+### Platform Health Metrics
+Per [Data Platform Strategy §6.1](../../../architecture/data-platform-strategy.md):
+- Data pipeline success rate: >99%
+- Data freshness SLA adherence: >95%
+- Mean time to recover (MTTR): <4 hours
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **SageMaker Batch Transform** for daily/hourly scoring with predictable cost
+- **SageMaker Model Registry** for retrieving approved model versions
+- **Amazon MWAA / Step Functions** for workflow orchestration
+- **Amazon CloudWatch** for pipeline monitoring and SLA tracking
+- **Amazon S3** for score output storage (Gold zone)

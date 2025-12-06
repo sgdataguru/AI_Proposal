@@ -98,3 +98,37 @@ As a **Data Scientist**, I want to train a machine learning model that predicts 
 - [Architecture Overview - ML Platform](../../../architecture/overview.md)
 - [Security & Governance - Model Governance](../../../architecture/security-governance.md)
 - [Business Case - AI Governance](../../../project-context/business-case.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story delivers the core AI capability for **REQ-001: Lead Prioritisation Intelligence**, establishing the "governance + data + deployment blueprint" that will be reused for Portfolio Review, Campaign Intelligence, and future AI products per [Business Case](../../../project-context/business-case.md). Model training implements the three-pillar AI Governance approach: Data Governance, Model Governance, and Operational Governance.
+
+### Architecture Context
+- **ML Platform**: Uses Amazon SageMaker (Studio, Training, Pipelines, Registry) per [Architecture Overview §3.3](../../../architecture/overview.md)
+- **Model Registry**: SageMaker Model Registry for version control and lifecycle management (Staging → Approved → Archived)
+- **Explainability**: SHAP/LIME required for top driver analysis per [Business Case - AI Governance](../../../project-context/business-case.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Model Development & Governance Review" (Weeks 5-8) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M3: PoC Model Ready** (Week 5) - Lead scoring model validated with directional lift
+- Success criteria: AUC > 0.70, model deployed to production with governance artifacts approved
+
+### Key Risks & Constraints
+- **R09 (High)**: Model decisions must have sufficient explainability for regulatory requirements - implement SHAP/LIME, document decisions, human-in-the-loop for threshold setting ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **R02 (Critical)**: Activation definition ambiguity - lock definition in Week 1 with business sign-off for valid training labels
+- **A07**: Assumes historical data covers at least 6-12 months of lead activity and outcomes
+- **C05**: Model explainability required - limits model complexity to interpretable approaches
+
+### Model Governance Framework
+Per [Security & Governance §7](../../../architecture/security-governance.md):
+- **Approval Workflow**: Technical Review → Business Review → Compliance Review → Production Approval
+- **Model Documentation**: Model card required with purpose, training data, performance metrics, bias considerations
+- **Lineage Tracking**: SageMaker Lineage for Features → Model → Predictions traceability
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon SageMaker Studio** for development environment and notebooks
+- **SageMaker Training Jobs** for managed training with tracked parameters
+- **SageMaker Model Registry** for version control and approval workflow
+- **SageMaker Pipelines** for reproducible ML workflows (production phase)

@@ -91,3 +91,44 @@ As a **Data Scientist**, I want automated drift detection that monitors model pe
 - [Architecture Overview - ML Platform](../../../architecture/overview.md)
 - [Risk Register - Data Drift Risk](../../../architecture/risk-constraint-register.md)
 - [Value Delivery Roadmap - Phase 2](../../../architecture/value-delivery-roadmap.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements the **Operational Governance** pillar's drift monitoring capability per [Business Case](../../../project-context/business-case.md). It supports **REQ-002: Closed-Loop Learning System** which requires "Model retraining triggers, Performance drift monitoring" to keep models relevant as market conditions evolve.
+
+### Architecture Context
+- **ML Platform**: SageMaker Model Monitor for production monitoring per [Architecture Overview §3.3](../../../architecture/overview.md)
+- **Monitoring Integration**: Model performance metrics feed into CloudWatch/QuickSight observability stack per [Data Platform Strategy §3.6](../../../architecture/data-platform-strategy.md)
+- **Baseline Statistics**: Captured at training time for comparison during inference
+
+### Timeline & Milestones
+- Drift monitoring established in **Phase 1** (Week 12) but full implementation in **Phase 2** per [Value Delivery Roadmap §3.2](../../../architecture/value-delivery-roadmap.md)
+- Phase 2 deliverable: "Model Monitoring - Drift detection and automated alerts" (Week 24)
+- Success criteria: Model performance degradation detected within 7 days, automated retraining cycle <30 days
+
+### Key Risks & Constraints
+- **R11 (High)**: Model performance degrades over time due to changing data patterns - implement SageMaker Model Monitor, define drift thresholds, establish retraining triggers ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **R02 (Critical)**: Activation definition changes could cause apparent drift - baseline must align with business-approved definitions
+- Monitoring must not impact inference latency (technical constraint)
+
+### Closed-Loop Learning Requirements
+Per [Data Platform Strategy REQ-002](../../../architecture/data-platform-strategy.md):
+- Outcome capture automation for feedback loops
+- Model retraining triggers based on drift thresholds
+- Performance drift monitoring with automated alerting
+- Target: <30 day automated retraining cycle
+
+### Key Risk Indicators (KRIs)
+Per [Risk Register §5.4](../../../architecture/risk-constraint-register.md):
+- Model accuracy decline >5% from baseline → Trigger retraining review
+- Data quality score <90% → Escalate to Data Lead
+- Stakeholder engagement score <3/5 → Change management intervention
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **SageMaker Model Monitor** for production drift detection (data quality, model quality, bias)
+- **Amazon CloudWatch** for drift metrics, alarms, and dashboards
+- **Amazon SNS** for drift alert notifications
+- **Amazon QuickSight** for drift trend visualization
+- **SageMaker Pipelines** for automated retraining workflow (Phase 2+)

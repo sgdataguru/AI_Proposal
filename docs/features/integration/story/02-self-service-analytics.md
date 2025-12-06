@@ -92,3 +92,46 @@ As a **Business Analyst**, I want self-service access to curated datasets throug
 - [Data Flows - Consumption Layer](../../../architecture/data-flows.md)
 - [Security & Governance - Access Patterns](../../../architecture/security-governance.md)
 - [Tech Stack - QuickSight](../../../project-context/tech-stack.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story enables the "governed, discoverable, and high-quality data accessible across the organization" vision per [Data Platform Strategy §1.2](../../../architecture/data-platform-strategy.md). Self-service analytics supports Strategic Bet #1 by expanding access after curated, governed analytics are established.
+
+### Architecture Context
+- **Consumption Layer**: Athena provides SQL access to Gold zone per [Data Flows §6](../../../architecture/data-flows.md)
+- **Access Control**: Lake Formation policies govern what analysts can query per [Security & Governance §2.5](../../../architecture/security-governance.md)
+- **BI Integration**: QuickSight connected to Athena with SPICE datasets for common reports per [Architecture Overview §2.2](../../../architecture/overview.md)
+
+### Timeline & Milestones
+- Foundation established in **Phase 1** but full capability in **Phase 2** per [Value Delivery Roadmap](../../../architecture/value-delivery-roadmap.md)
+- Phase 2 deliverable: "Curated Data Mart - Self-service access to governed client metrics" (Week 24)
+- Phase 3 expands: "Self-service analytics capabilities" with experimentation framework
+
+### Key Risks & Constraints
+- **R05 (High)**: Low frontline adoption - provide training, sample queries, and simple interfaces ([Risk Register](../../../architecture/risk-constraint-register.md))
+- Analysts restricted to Gold zone per governance policies
+- PII columns masked or excluded for analyst access
+- Query cost controls required per workgroup
+
+### Access Patterns by Persona
+Per [Data Flows §6.2](../../../architecture/data-flows.md) and [Security & Governance §2.4](../../../architecture/security-governance.md):
+| Persona | Access Method | Data Scope | Governance |
+|---------|---------------|------------|------------|
+| Data Scientist | SageMaker, Athena | Silver/Gold | Lake Formation |
+| Business Analyst | QuickSight, Athena | Gold only | Read-only |
+| Data Engineer | Glue Console, Athena | All zones | Admin role |
+
+### Analytics Enablement
+Per [Data Platform Strategy §4.4](../../../architecture/data-platform-strategy.md):
+- **Semantic Layer**: Curated datasets with business-friendly naming
+- **Pre-built Metrics**: Common KPIs and aggregations available
+- **Self-service Controls**: Governed sandbox with access controls
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon Athena** for ad-hoc SQL queries against S3
+- **Amazon QuickSight** for dashboards and SPICE datasets
+- **AWS Lake Formation** for fine-grained access control
+- **AWS Glue Data Catalog** for table metadata and schema documentation
+- **Amazon CloudWatch** for query logging and cost monitoring

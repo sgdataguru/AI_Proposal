@@ -87,3 +87,47 @@ As a **Data Engineer**, I want to set up AWS Glue Data Catalog with schema disco
 - [Architecture Overview](../../../architecture/overview.md)
 - [Data Platform Strategy - Data Catalog](../../../architecture/data-platform-strategy.md#36-data-lineage-catalog--observability)
 - [Security & Governance](../../../architecture/security-governance.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story implements the "Governed, discoverable, and high-quality data accessible across the organization" vision from [Data Platform Strategy §1.2](../../../architecture/data-platform-strategy.md). The Glue Catalog serves as the central metadata repository enabling data discovery and schema management.
+
+### Architecture Context
+- **Catalog Integration**: Glue Catalog integrated with Lake Formation for access control metadata per [Architecture Overview §3.4](../../../architecture/overview.md)
+- **Schema Management**: Schema versioning and evolution support per [Data Platform Strategy §3.6](../../../architecture/data-platform-strategy.md)
+- **Data Lineage**: Column-level lineage tracking via Glue per [Data Platform Strategy §3.6](../../../architecture/data-platform-strategy.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Data Platform Foundation Setup" (Weeks 2-4) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M2: Platform Foundation** (Week 4) - Data catalog operational
+- Supports future self-service: Phase 2 delivers "Curated Data Mart" for analyst access (Week 24)
+
+### Key Risks & Constraints
+- **A17**: Assumes data quality is sufficient - catalog metadata enables quality tracking per dataset ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **C04**: All infrastructure must be defined as Terraform code
+- Crawler schedules must not conflict with ETL jobs (operational constraint)
+- Schema evolution must be backward compatible
+
+### Database Structure
+Per [Data Platform Strategy §3.2](../../../architecture/data-platform-strategy.md):
+| Database | Zone | Initial Tables |
+|----------|------|----------------|
+| raw_db | Bronze | leads, campaigns, outcomes |
+| curated_db | Silver | leads, campaigns, outcomes (conformed) |
+| analytics_db | Gold | lead_scores, lead_features, reports |
+| features_db | Features | lead_features, model_features |
+
+### Metadata & Governance Tags
+Per [Security & Governance §5.3](../../../architecture/security-governance.md):
+- **Data Classification**: PII, Confidential, Internal, Public
+- **Ownership**: Data Steward, Technical Owner, Business Owner
+- **Sensitivity**: Tags for Lake Formation column-level security
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **AWS Glue Data Catalog** for schema discovery and versioning
+- **AWS Glue Crawlers** for automatic schema detection
+- **AWS Lake Formation** for access control metadata integration
+- **AWS KMS** for catalog encryption
+- **Terraform** for infrastructure as code

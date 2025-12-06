@@ -99,3 +99,35 @@ As a **Data Scientist**, I want an automated feature engineering pipeline that g
 - [Data Platform Strategy - Feature Store](../../../architecture/data-platform-strategy.md)
 - [Architecture Overview - ML Platform](../../../architecture/overview.md)
 - [Business Case - Lead Scoring](../../../project-context/business-case.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story supports **REQ-001: Lead Prioritisation Intelligence** by creating the predictive features needed for lead scoring. The feature engineering pipeline establishes reusable patterns per Strategic Bet #1, creating a foundation for future AI products including Portfolio Review and Campaign Intelligence per [Business Case](../../../project-context/business-case.md).
+
+### Architecture Context
+- **Feature Store Location**: Features stored in Gold zone at `s3://bucket/features/lead_features/` per [Architecture Overview §3.1](../../../architecture/overview.md)
+- **ML Platform Integration**: Features feed into Amazon SageMaker for model training and batch inference per [Architecture Overview §3.3](../../../architecture/overview.md)
+- **Processing Engine**: Heavy feature engineering may leverage Amazon EMR for large-scale computation per [Data Platform Strategy §3.3](../../../architecture/data-platform-strategy.md)
+
+### Timeline & Milestones
+- Part of **Phase 1** "Data Prep & Feature Build" (Weeks 3-5) and "Model Development" (Weeks 5-8) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M3: PoC Model Ready** (Week 5) requires feature pipeline operational
+- Features must be ready for daily model scoring by Week 9
+
+### Key Risks & Constraints
+- **R06 (Medium)**: Feature engineering complexity may exceed available skills/time - mitigate by starting with proven industry patterns and leveraging SageMaker built-in capabilities ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **A17**: Assumes data quality is sufficient - feature engineering depends on curated Silver zone data
+- **C06**: Real-time feature computation out of scope for Phase 1; batch features only
+
+### Data Modeling Context
+Per [Data Platform Strategy §3.4](../../../architecture/data-platform-strategy.md), the feature store supports the dimensional model:
+- **Fact tables**: fact_lead_interactions (engagement signals), fact_lead_outcomes (conversion labels)
+- **Dimension tables**: dim_lead (demographic attributes), dim_campaign (channel/source info), dim_time (temporal features)
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **AWS Glue / Amazon EMR** for feature computation at scale
+- **Amazon S3** for feature store (`features/lead_features/`)
+- **SageMaker Feature Store** (optional for Phase 2) for centralized feature management
+- **Parquet with Snappy compression** for optimized storage and query performance

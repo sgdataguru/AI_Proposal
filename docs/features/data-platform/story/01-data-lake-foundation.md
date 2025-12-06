@@ -85,3 +85,48 @@ As a **Data Engineer**, I want to establish the foundational S3-based data lake 
 - [Architecture Overview](../../../architecture/overview.md)
 - [Data Platform Strategy](../../../architecture/data-platform-strategy.md)
 - [Data Flows](../../../architecture/data-flows.md)
+
+## 📚 Relevant Context
+
+### Strategic Alignment
+This story establishes the foundational infrastructure for Strategic Bet #1: "Prioritize curated, governed analytics over raw data exploration in Phase 1" per [Data Platform Strategy](../../../architecture/data-platform-strategy.md). The S3 data lake serves as the "Single Source of Truth" for all downstream analytics and ML workloads.
+
+### Architecture Context
+- **Medallion Architecture**: Bronze/Silver/Gold zone structure per [Architecture Overview §3.1](../../../architecture/overview.md) and [Data Platform Strategy §3.1](../../../architecture/data-platform-strategy.md)
+- **Storage Strategy**: S3 Standard → Intelligent-Tiering → Glacier lifecycle per [Data Platform Strategy §3.2](../../../architecture/data-platform-strategy.md)
+- **Integration with Lake Formation**: S3 buckets registered for fine-grained access control per governance requirements
+
+### Timeline & Milestones
+- Part of **Phase 1** "Data Platform Foundation Setup" (Weeks 2-4) per [Value Delivery Roadmap §3.1](../../../architecture/value-delivery-roadmap.md)
+- Target milestone: **M2: Platform Foundation** (Week 4) - Data lake operational
+- Success criteria: Zone structure supports batch loads, 100% buckets under Lake Formation control
+
+### Key Risks & Constraints
+- **C02**: Data must remain in AWS Mumbai region (ap-south-1) for regulatory compliance ([Risk Register](../../../architecture/risk-constraint-register.md))
+- **C04**: All infrastructure must be defined as Terraform code (IaC)
+- **A06**: AWS cloud infrastructure can be provisioned within standard timelines (1-2 weeks)
+- Security: Encryption at rest (SSE-KMS), VPC endpoints for private access, bucket versioning enabled
+
+### Storage Zone Configuration
+Per [Data Platform Strategy §3.2](../../../architecture/data-platform-strategy.md):
+| Zone | Purpose | Lifecycle Policy |
+|------|---------|------------------|
+| Bronze (raw/) | Source data preserved | S3 Standard → IA (90d) → Glacier (1y) |
+| Silver (curated/) | Cleansed, conformed | S3 Standard → IA (180d) |
+| Gold (analytics/) | Business-aligned | S3 Standard → IA (1y) |
+| Features | ML feature store | S3 Standard (1 year retention) |
+| Models | ML artifacts | S3 Standard (indefinite) |
+
+### File Format & Partitioning
+Per [Data Flows §5.3-5.4](../../../architecture/data-flows.md):
+- **Default format**: Parquet with Snappy compression for analytics
+- **Partitioning**: Time-based (year/month/day for raw, dt for curated)
+- **Versioning**: Enabled on all buckets for recovery and audit
+
+### Technology Stack
+Per [Tech Stack](../../../project-context/tech-stack.md):
+- **Amazon S3** as single source of truth
+- **AWS Lake Formation** for registration and access control
+- **AWS Glue Data Catalog** for database-per-zone metadata
+- **AWS KMS** with Customer Managed Keys (CMK) for encryption
+- **Terraform** for infrastructure as code
