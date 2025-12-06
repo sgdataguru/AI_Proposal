@@ -1,0 +1,28 @@
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# IDE files
+.idea/
+*.swp
+*.swo
+
+# Environment files (keep .env.example)
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
