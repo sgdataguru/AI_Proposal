@@ -45,7 +45,7 @@ This delivery approach follows the sequenced value build outlined in the [Busine
 | **Value-First** | Deliver measurable business outcomes early | Builds stakeholder confidence and proves concept |
 | **Foundation Early** | Establish security, observability, and governance in Phase 1 | Prevents technical debt and enables future scaling |
 | **End-to-End Vertical Slices** | Complete working capabilities, not partial horizontal layers | Ensures each phase delivers usable functionality |
-| **Learn & Adapt** | Build feedback loops and adjust based on learnings | Enables continuous improvement and de-risks larger investments |
+| **Learn & Adapt** | Build feedback loops and adjust based on learnings | Enables continuous improvement and reduces risks for larger investments |
 | **Measurable Outcomes** | Define success criteria upfront for each phase | Ensures alignment between delivery and business value |
 
 ### 2.2 Delivery Model

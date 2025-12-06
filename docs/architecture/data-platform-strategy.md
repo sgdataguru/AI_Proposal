@@ -328,7 +328,7 @@ This platform will serve as the **foundation for a trusted AI product ecosystem*
 - Version-controlled infrastructure changes
 - Automated testing of infrastructure changes
 
-**Repository Structure (Aligned with [Terraform Guidelines](../..)):**
+**Repository Structure:**
 ```
 infra/
 ├── components/         # Logical infrastructure components
@@ -440,11 +440,7 @@ Tracked in coordination with [Value Delivery Roadmap](./value-delivery-roadmap.m
 
 ---
 
-## Appendix A: Glossary
-
-See [Glossary](../project-context/glossary.md) for standard terminology definitions.
-
-## Appendix B: References
+## Appendix A: References
 
 - [Business Case](../project-context/business-case.md)
 - [Technology Stack](../project-context/tech-stack.md)
