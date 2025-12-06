@@ -147,3 +147,109 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS WAF** for API protection (optional)
 - **Amazon CloudWatch** for request metrics and logging
 - **Terraform** for infrastructure as code
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Set up an API Gateway that delivers lead scores to external systems via secure, documented APIs, enabling CRM and other applications to retrieve scores programmatically.
+
+**Primary User Role:** Integration Engineer
+
+**Business Value:** Provides >99.9% API availability with <500ms response latency, enabling real-time score access for CRM and other systems.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| Score Output | Lead Scoring Story 05 | **REUSE** - Data source |
+| VPC Infrastructure | Security Story 01 | **REUSE** - Lambda VPC |
+| CloudWatch | Shared Infrastructure | **REUSE** - Logging |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| REST API | API Gateway definition | High |
+| Lambda Functions | Score retrieval logic | High |
+| API Documentation | OpenAPI spec | High |
+| DynamoDB Cache | Low-latency retrieval | Medium |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/api-gateway/main.tf` | [CREATE] | API Gateway module |
+| `infra/modules/api-gateway/routes.tf` | [CREATE] | API routes |
+| `infra/modules/api-gateway/lambda.tf` | [CREATE] | Lambda integrations |
+
+#### Lambda Functions
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/lambda/get_lead_score/handler.py` | [CREATE] | Single lead score |
+| `src/lambda/batch_scores/handler.py` | [CREATE] | Batch scores |
+| `src/lambda/latest_scores/handler.py` | [CREATE] | Latest run summary |
+
+#### Documentation
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `docs/api/openapi-spec.yaml` | [CREATE] | OpenAPI specification |
+| `docs/api/integration-guide.md` | [CREATE] | Integration guide |
+
+### 4. Component Breakdown
+
+#### 4.1 API Endpoints
+
+| Endpoint | Method | Description | Latency Target |
+|----------|--------|-------------|----------------|
+| `/leads/{leadId}/score` | GET | Single lead score | <500ms |
+| `/leads/scores/batch` | POST | Multiple lead scores | <2s |
+| `/scores/latest` | GET | Latest scoring run summary | <500ms |
+
+#### 4.2 Response Schema
+
+```json
+{
+  "leadId": "L12345",
+  "score": 0.87,
+  "scoreBand": "Hot",
+  "topDrivers": [
+    {"feature": "engagement_score", "contribution": 0.35},
+    {"feature": "recency_days", "contribution": 0.28},
+    {"feature": "channel_quality", "contribution": 0.22}
+  ],
+  "modelVersion": "v1.2",
+  "scoreDate": "2024-12-01"
+}
+```
+
+### 5. Implementation Steps
+
+#### Phase 1: API Development (Week 8-9)
+- [ ] **Step 1.1:** Create OpenAPI specification
+- [ ] **Step 1.2:** Implement GET /leads/{leadId}/score Lambda
+- [ ] **Step 1.3:** Implement POST /leads/scores/batch Lambda
+- [ ] **Step 1.4:** Implement GET /scores/latest Lambda
+
+#### Phase 2: API Gateway Setup (Week 9)
+- [ ] **Step 2.1:** Create API Gateway REST API
+- [ ] **Step 2.2:** Configure API key authentication
+- [ ] **Step 2.3:** Set up rate limiting (1000 req/min)
+- [ ] **Step 2.4:** Configure CORS headers
+
+#### Phase 3: Documentation & Testing (Week 9-10)
+- [ ] **Step 3.1:** Generate Swagger documentation
+- [ ] **Step 3.2:** Create integration guide
+- [ ] **Step 3.3:** Test API endpoints
+- [ ] **Step 3.4:** Load test for performance
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| Batch Scoring Pipeline | Lead Scoring Story 05 | Required |
+| VPC with private subnets | Security Story 01 | Required |
+| Lambda execution role | Shared Infrastructure | Required |

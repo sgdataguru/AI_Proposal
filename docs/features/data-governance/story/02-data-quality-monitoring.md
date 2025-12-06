@@ -134,3 +134,111 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **Amazon SNS** for quality alert notifications
 - **Amazon QuickSight** for quality dashboards and trend visualization
 - **Amazon Athena** for quality metrics analysis
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Implement automated data quality monitoring across all data zones to proactively identify and address data issues before they impact downstream analytics and model performance.
+
+**Primary User Role:** Data Steward
+
+**Business Value:** Maintains >95% data quality score across all datasets, directly addressing R01 risk of historical data quality gaps and enabling trust in AI outputs.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| ETL Framework | Data Platform Story 03 | **EXTEND** - Add DQ rules |
+| CloudWatch | Shared Infrastructure | **REUSE** - Metrics namespace |
+| QuickSight | Lead Scoring Story 07 | **EXTEND** - Quality dashboard |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Quality Rulesets | Glue DQ configurations | High |
+| Quality Metrics Store | S3 storage for metrics | High |
+| Quality Dashboard | Visualization | Medium |
+| Alert Configuration | SNS notifications | High |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/data-quality/main.tf` | [CREATE] | DQ module |
+| `infra/modules/data-quality/rulesets.tf` | [CREATE] | Rule configurations |
+| `infra/modules/data-quality/alerts.tf` | [CREATE] | Alert setup |
+
+#### Quality Rules
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/quality/rulesets/leads_rules.yaml` | [CREATE] | Lead quality rules |
+| `src/quality/rulesets/campaigns_rules.yaml` | [CREATE] | Campaign rules |
+| `src/quality/rulesets/scores_rules.yaml` | [CREATE] | Score validation rules |
+
+### 4. Component Breakdown
+
+#### 4.1 Quality Dimensions & Rules
+
+| Dimension | Rules | Threshold | Action |
+|-----------|-------|-----------|--------|
+| **Completeness** | Null count per column | >5% nulls | Alert + quarantine |
+| **Uniqueness** | Duplicate detection on PK | Any duplicates | Deduplicate + log |
+| **Validity** | Schema conformance | Any mismatch | Reject records |
+| **Accuracy** | Business rule validation | Per-rule | Flag for review |
+| **Timeliness** | Data freshness | >6 hours stale | Alert operations |
+| **Consistency** | Cross-source reconciliation | >1% variance | Investigation |
+
+#### 4.2 Quality Scoring
+
+```python
+def compute_quality_score(df: DataFrame, rules: list) -> dict:
+    """Compute overall quality score (0-100)."""
+    scores = {
+        'completeness': check_completeness(df),
+        'uniqueness': check_uniqueness(df),
+        'validity': check_validity(df),
+    }
+    
+    weights = {'completeness': 0.4, 'uniqueness': 0.3, 'validity': 0.3}
+    overall = sum(scores[k] * weights[k] for k in scores)
+    
+    return {
+        'overall_score': overall,
+        'dimension_scores': scores,
+        'timestamp': datetime.utcnow().isoformat()
+    }
+```
+
+### 5. Implementation Steps
+
+#### Phase 1: Rule Development (Week 4)
+- [ ] **Step 1.1:** Define completeness rules for lead data
+- [ ] **Step 1.2:** Define uniqueness rules (primary keys)
+- [ ] **Step 1.3:** Define validity rules (enums, formats, ranges)
+- [ ] **Step 1.4:** Define freshness rules (SLA thresholds)
+
+#### Phase 2: Infrastructure (Week 4-5)
+- [ ] **Step 2.1:** Create quality metrics S3 bucket
+- [ ] **Step 2.2:** Set up Glue Data Quality ruleset execution
+- [ ] **Step 2.3:** Configure CloudWatch metrics namespace
+- [ ] **Step 2.4:** Create SNS topics for quality alerts
+
+#### Phase 3: Dashboard & Process (Week 5)
+- [ ] **Step 3.1:** Create quality score aggregation queries
+- [ ] **Step 3.2:** Build quality dashboard in QuickSight
+- [ ] **Step 3.3:** Define quality issue escalation process
+- [ ] **Step 3.4:** Set up weekly quality review cadence
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| ETL Pipeline Framework | Data Platform Story 03 | Required |
+| Glue Data Catalog | Data Platform Story 02 | Required |
+| CloudWatch | Shared Infrastructure | Required |
+| QuickSight | Infrastructure | Required |

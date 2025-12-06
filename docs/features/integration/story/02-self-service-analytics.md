@@ -135,3 +135,110 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS Lake Formation** for fine-grained access control
 - **AWS Glue Data Catalog** for table metadata and schema documentation
 - **Amazon CloudWatch** for query logging and cost monitoring
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Provide self-service access to curated datasets through Amazon Athena so business analysts can run ad-hoc queries and build reports without requiring data engineering support.
+
+**Primary User Role:** Business Analyst
+
+**Business Value:** Enables 50% of routine analyses to be self-served, reducing data request tickets by 30% and accelerating time-to-insight.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| Gold Zone Data | Data Platform Story 01 | **REUSE** - Query target |
+| Lake Formation | Data Governance Story 01 | **REUSE** - Access control |
+| QuickSight | Lead Scoring Story 07 | **EXTEND** - Analyst access |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Athena Workgroups | Team-based cost control | High |
+| Analyst Views | Simplified data access | High |
+| Query Library | Common query patterns | Medium |
+| Training Materials | User enablement | Medium |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/athena-workgroup/main.tf` | [CREATE] | Workgroup module |
+| `infra/modules/athena-workgroup/cost-controls.tf` | [CREATE] | Cost limits |
+
+#### SQL Views
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/analytics/views/analyst_lead_scores.sql` | [CREATE] | Lead scores view |
+| `src/analytics/views/analyst_conversion.sql` | [CREATE] | Conversion view |
+| `src/analytics/queries/common_queries.sql` | [CREATE] | Query library |
+
+#### Documentation
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `docs/analytics/self-service-guide.md` | [CREATE] | User guide |
+| `docs/analytics/table-dictionary.md` | [CREATE] | Table documentation |
+
+### 4. Component Breakdown
+
+#### 4.1 Workgroup Configuration
+
+| Workgroup | Team | Data Scan Limit | Query Timeout |
+|-----------|------|-----------------|---------------|
+| analyst-workgroup | Business Analysts | 100 GB/day | 30 minutes |
+| datascience-workgroup | Data Scientists | 500 GB/day | 2 hours |
+
+#### 4.2 Analyst-Friendly Views
+
+```sql
+-- Simplified lead scores view (PII masked)
+CREATE OR REPLACE VIEW analyst_lead_scores AS
+SELECT 
+    lead_id,
+    score_value,
+    score_band,
+    model_version,
+    score_date,
+    -- PII columns excluded
+    lead_source,
+    lead_channel,
+    acquisition_date
+FROM analytics_db.lead_scores
+WHERE score_date >= DATE_SUB(CURRENT_DATE, 90);
+```
+
+### 5. Implementation Steps
+
+#### Phase 1: Athena Setup (Week 16-18)
+- [ ] **Step 1.1:** Create analyst workgroup with cost controls
+- [ ] **Step 1.2:** Configure query results S3 location
+- [ ] **Step 1.3:** Set up data scan limits
+- [ ] **Step 1.4:** Create saved queries library
+
+#### Phase 2: View Development (Week 18-20)
+- [ ] **Step 2.1:** Create analyst-friendly views over Gold tables
+- [ ] **Step 2.2:** Document view definitions and usage
+- [ ] **Step 2.3:** Implement PII masking in views
+- [ ] **Step 2.4:** Set up view refresh automation
+
+#### Phase 3: Training & Documentation (Week 20-22)
+- [ ] **Step 3.1:** Create SQL query guide for analysts
+- [ ] **Step 3.2:** Document available tables and columns
+- [ ] **Step 3.3:** Create sample queries for common analyses
+- [ ] **Step 3.4:** Conduct training session for analysts
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| Lake Formation Access Control | Data Governance Story 01 | Required |
+| Gold zone populated | Lead Scoring Story 05 | Required |
+| Glue Catalog | Data Platform Story 02 | Required |
+| QuickSight Enterprise | Infrastructure | Required |

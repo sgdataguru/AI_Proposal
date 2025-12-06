@@ -125,3 +125,216 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS Glue Data Quality** for automated quality checks
 - **Amazon S3** for Silver zone storage (`curated/leads/`)
 - **Amazon CloudWatch** for quality metrics logging
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Cleanse, deduplicate, and conform lead data to a standard schema in the Silver zone, ensuring data quality for downstream analysis and model training.
+
+**Primary User Role:** Data Analyst
+
+**Business Value:** Delivers trusted, high-quality data with >95% quality pass rate, enabling accurate model training and reliable analytics. Directly addresses R01 risk of historical data quality gaps.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| Bronze Zone Data | Lead Scoring Story 01 | **REUSE** - Source data |
+| ETL Framework | Data Platform Story 03 | **REUSE** - Templates |
+| Data Quality Rules | Data Platform Story 03 | **EXTEND** - Lead-specific rules |
+| Glue Catalog | Data Platform Story 02 | **REUSE** - Schema management |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Lead Curation Job | B2S transformation logic | High |
+| Quality Scoring Function | Compute quality metrics | High |
+| PII Masking Module | Non-prod data masking | High |
+| Quarantine Handler | Failed record routing | Medium |
+
+### 3. Affected Files
+
+#### ETL Code
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/etl/curation/lead_curation.py` | [CREATE] | Main curation job |
+| `src/etl/curation/deduplication.py` | [CREATE] | Dedup logic |
+| `src/etl/curation/null_handler.py` | [CREATE] | Null handling rules |
+| `src/etl/curation/schema_conformer.py` | [CREATE] | Schema conformance |
+| `src/etl/curation/pii_masking.py` | [CREATE] | PII masking for non-prod |
+
+#### Schema Definitions
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/etl/schemas/lead_curated_schema.json` | [CREATE] | Silver zone schema |
+
+#### Tests
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `tests/curation/test_lead_curation.py` | [CREATE] | Curation tests |
+| `tests/curation/test_deduplication.py` | [CREATE] | Dedup tests |
+| `tests/curation/test_quality_scoring.py` | [CREATE] | Quality score tests |
+
+### 4. Component Breakdown
+
+#### 4.1 Lead Curation Pipeline
+
+```python
+# src/etl/curation/lead_curation.py
+"""
+Lead Data Curation Pipeline
+Transforms Bronze to Silver with quality checks.
+"""
+
+class LeadCurationPipeline:
+    """Main curation pipeline for lead data."""
+    
+    def __init__(self, config: dict):
+        self.config = config
+        self.quality_metrics = {}
+        
+    def execute(self, bronze_df: DataFrame) -> Tuple[DataFrame, DataFrame, dict]:
+        """
+        Execute curation pipeline.
+        
+        Returns:
+            Tuple of (curated_df, quarantine_df, quality_metrics)
+        """
+        # Step 1: Deduplication
+        deduped_df, dup_count = self.deduplicate(bronze_df)
+        self.quality_metrics['duplicates_removed'] = dup_count
+        
+        # Step 2: Null handling
+        cleaned_df, null_stats = self.handle_nulls(deduped_df)
+        self.quality_metrics['null_stats'] = null_stats
+        
+        # Step 3: Type casting
+        typed_df = self.cast_types(cleaned_df)
+        
+        # Step 4: Date normalization
+        normalized_df = self.normalize_dates(typed_df)
+        
+        # Step 5: Schema conformance
+        conformed_df, invalid_df = self.conform_schema(normalized_df)
+        
+        # Step 6: Quality scoring
+        quality_scores = self.compute_quality_score(conformed_df)
+        self.quality_metrics['quality_scores'] = quality_scores
+        
+        # Step 7: PII masking (non-prod only)
+        if self.config.get('environment') != 'prod':
+            conformed_df = self.mask_pii(conformed_df)
+        
+        return conformed_df, invalid_df, self.quality_metrics
+    
+    def deduplicate(self, df: DataFrame) -> Tuple[DataFrame, int]:
+        """Remove duplicates, keeping most recent by last_updated."""
+        window = Window.partitionBy('lead_id').orderBy(col('last_updated').desc())
+        deduped = df.withColumn('row_num', row_number().over(window)) \
+                    .filter(col('row_num') == 1) \
+                    .drop('row_num')
+        return deduped, df.count() - deduped.count()
+```
+
+#### 4.2 Curated Lead Schema
+
+```json
+{
+  "schema_name": "lead_curated",
+  "version": "1.0.0",
+  "columns": [
+    {"name": "lead_id", "type": "string", "nullable": false, "description": "Unique lead identifier (PK)"},
+    {"name": "lead_source", "type": "string", "nullable": false, "enum": ["CRM", "CAMPAIGN", "PARTNER", "DIRECT", "REFERRAL"]},
+    {"name": "lead_channel", "type": "string", "nullable": true, "enum": ["WEB", "MOBILE", "CALL", "EMAIL", "PARTNER"]},
+    {"name": "acquisition_date", "type": "timestamp", "nullable": false, "format": "ISO8601"},
+    {"name": "contact_email", "type": "string", "nullable": true, "pii": true, "masked_in_nonprod": true},
+    {"name": "contact_phone", "type": "string", "nullable": true, "pii": true, "masked_in_nonprod": true},
+    {"name": "engagement_score", "type": "decimal(10,4)", "nullable": true, "range": [0, 100]},
+    {"name": "lead_status", "type": "string", "nullable": false, "enum": ["NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "LOST"]},
+    {"name": "last_updated", "type": "timestamp", "nullable": false, "format": "ISO8601"},
+    {"name": "dq_completeness_score", "type": "decimal(5,2)", "nullable": false},
+    {"name": "dq_validity_score", "type": "decimal(5,2)", "nullable": false}
+  ],
+  "partition_keys": [
+    {"name": "dt", "type": "string", "format": "YYYY-MM-DD"}
+  ]
+}
+```
+
+### 5. Data Flow & Pipeline Architecture
+
+```mermaid
+flowchart TB
+    subgraph Bronze["Bronze Zone"]
+        RAW[raw/leads/]
+    end
+    
+    subgraph Curation["Curation Pipeline"]
+        DEDUP[Deduplication]
+        NULL[Null Handling]
+        CAST[Type Casting]
+        DATE[Date Normalization]
+        SCHEMA[Schema Conformance]
+        SCORE[Quality Scoring]
+        MASK[PII Masking]
+    end
+    
+    subgraph Output["Output"]
+        SILVER[curated/leads/]
+        QUARANTINE[quarantine/leads/]
+        METRICS[Quality Metrics]
+    end
+    
+    RAW --> DEDUP
+    DEDUP --> NULL
+    NULL --> CAST
+    CAST --> DATE
+    DATE --> SCHEMA
+    SCHEMA -->|Valid| SCORE
+    SCHEMA -->|Invalid| QUARANTINE
+    SCORE --> MASK
+    MASK --> SILVER
+    SCORE --> METRICS
+```
+
+### 6. Testing Strategy
+
+| Test Type | Test Description | Expected Outcome |
+|-----------|------------------|------------------|
+| Unit Test | Deduplication with various scenarios | 100% duplicates removed |
+| Unit Test | Null handling rules | Correct defaults applied |
+| Unit Test | PII masking accuracy | All PII fields masked |
+| Integration Test | End-to-end curation | >95% quality pass rate |
+| Data Quality Test | Schema conformance | 100% records conform |
+
+### 7. Implementation Steps
+
+#### Phase 1: Development (Week 4)
+- [ ] **Step 1.1:** Implement deduplication logic
+- [ ] **Step 1.2:** Create null handling functions
+- [ ] **Step 1.3:** Build schema conformance mapper
+- [ ] **Step 1.4:** Implement date normalization
+
+#### Phase 2: Quality Integration (Week 4-5)
+- [ ] **Step 2.1:** Define completeness rules for lead data
+- [ ] **Step 2.2:** Define validity rules (enum values, formats)
+- [ ] **Step 2.3:** Implement quality scoring function
+- [ ] **Step 2.4:** Create quarantine routing logic
+
+#### Phase 3: Validation (Week 5)
+- [ ] **Step 3.1:** Test with known data quality issues
+- [ ] **Step 3.2:** Verify deduplication accuracy
+- [ ] **Step 3.3:** Confirm PII masking in non-prod
+- [ ] **Step 3.4:** Validate quality scores against manual review
+
+### 8. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| Lead Data Ingestion | Lead Scoring Story 01 | Required |
+| Glue ETL Framework | Data Platform Story 03 | Required |
+| Data quality rules defined with business | Business | Required |

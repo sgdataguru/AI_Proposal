@@ -141,3 +141,113 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS CloudTrail** for secret access audit logging
 - **Amazon CloudWatch** for rotation failure alerts
 - **Terraform** for secret and policy management as code
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Configure AWS Secrets Manager for secure credential storage to ensure database passwords, API keys, and other secrets are never hardcoded and are automatically rotated.
+
+**Primary User Role:** DevOps Engineer
+
+**Business Value:** Achieves 100% credentials in Secrets Manager with zero hardcoded secrets, enabling secure CRM integration and external system connectivity.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| KMS Keys | Security Story 02 | **REUSE** - Secret encryption |
+| VPC Endpoints | Security Story 01 | **REUSE** - Private access |
+| CloudTrail | Security Story 03 | **REUSE** - Access logging |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Secret Definitions | Credential storage | Critical |
+| IAM Policies | Secret access control | High |
+| Rotation Lambdas | Automatic rotation | Medium |
+| Access Monitoring | Usage tracking | Medium |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/secrets/main.tf` | [CREATE] | Secrets module |
+| `infra/modules/secrets/policies.tf` | [CREATE] | Access policies |
+| `infra/modules/secrets/rotation.tf` | [CREATE] | Rotation config |
+
+#### Lambda Functions
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/lambda/rotate_db_secret/handler.py` | [CREATE] | DB rotation Lambda |
+
+### 4. Component Breakdown
+
+#### 4.1 Secret Organization
+
+```
+/prod/data-platform/
+├── crm-credentials          # CRM system access
+├── api-keys/
+│   ├── external-api-1       # External API key
+│   └── external-api-2       # External API key
+└── database/
+    └── glue-connection      # Database credentials
+
+/dev/data-platform/
+└── (same structure)
+```
+
+#### 4.2 Rotation Schedule
+
+| Secret Type | Rotation Period | Method |
+|-------------|----------------|--------|
+| Database credentials | 30 days | Rotation Lambda |
+| API keys | 90 days | Manual or automated |
+| CRM credentials | 90 days | Based on CRM policy |
+
+#### 4.3 Access Control
+
+| Principal | Secrets Access |
+|-----------|----------------|
+| GlueJobRole | Read CRM credentials, DB connections |
+| LambdaRole | Read API keys |
+| DataEngineerRole | Read/Update (non-prod only) |
+
+### 5. Implementation Steps
+
+#### Phase 1: Secret Setup (Week 2-3)
+- [ ] **Step 1.1:** Create secrets for CRM credentials
+- [ ] **Step 1.2:** Create secrets for API keys
+- [ ] **Step 1.3:** Create secrets for database connections
+- [ ] **Step 1.4:** Configure secret naming convention
+
+#### Phase 2: Access Configuration (Week 3)
+- [ ] **Step 2.1:** Create IAM policies for secret access
+- [ ] **Step 2.2:** Configure Glue connections with secrets
+- [ ] **Step 2.3:** Update Lambda functions to use secrets
+- [ ] **Step 2.4:** Remove any hardcoded credentials
+
+#### Phase 3: Rotation Setup (Week 3-4)
+- [ ] **Step 3.1:** Create rotation Lambda for database secrets
+- [ ] **Step 3.2:** Configure rotation schedules
+- [ ] **Step 3.3:** Test rotation in dev environment
+- [ ] **Step 3.4:** Document rotation procedures
+
+#### Phase 4: Monitoring (Week 4)
+- [ ] **Step 4.1:** Set up alerts for rotation failures
+- [ ] **Step 4.2:** Monitor secret access patterns
+- [ ] **Step 4.3:** Create dashboard for secret health
+- [ ] **Step 4.4:** Verify no plaintext secrets in codebase
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| KMS keys for encryption | Security Story 02 | Required |
+| IAM roles for services | Shared Infrastructure | Required |
+| VPC endpoint for Secrets Manager | Security Story 01 | Required |
