@@ -139,3 +139,104 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS CloudTrail** for key usage audit logging
 - **Terraform** for key and policy management as code
 - TLS 1.2+ enforced on all S3 bucket policies
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Configure AWS KMS for encryption key management to ensure all data at rest and in transit is encrypted with customer-managed keys and proper key rotation.
+
+**Primary User Role:** Security Engineer
+
+**Business Value:** Achieves 100% encryption coverage at rest and in transit, enabling compliance with Indian data protection regulations and financial services audit requirements.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| AWS Account | Infrastructure | **REUSE** - KMS target |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| CMK per Environment | Master encryption keys | Critical |
+| Key Policies | Access control for keys | Critical |
+| Service Integrations | S3, Glue, SageMaker encryption | High |
+| Key Rotation | Annual automatic rotation | High |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/kms/main.tf` | [CREATE] | KMS module |
+| `infra/modules/kms/key-policy.tf` | [CREATE] | Key policies |
+| `infra/modules/kms/aliases.tf` | [CREATE] | Key aliases |
+| `infra/components/security/kms.tf` | [CREATE] | KMS component |
+
+### 4. Component Breakdown
+
+#### 4.1 Key Hierarchy
+
+```
+Organization
+├── Dev Account
+│   └── CMK: alias/dev-data-platform
+├── UAT Account
+│   └── CMK: alias/uat-data-platform
+└── Prod Account
+    └── CMK: alias/prod-data-platform
+```
+
+#### 4.2 Encryption Coverage
+
+| Service | Encryption Type | Key |
+|---------|----------------|-----|
+| S3 | SSE-KMS with bucket keys | CMK |
+| Glue Data Catalog | KMS encryption | CMK |
+| SageMaker | KMS for volumes/artifacts | CMK |
+| CloudWatch Logs | KMS encryption | CMK |
+| Secrets Manager | KMS encryption | AWS Managed |
+
+#### 4.3 Key Policy Principles
+
+- Separate keys per environment
+- Key administrators cannot use keys
+- Key users cannot administer keys
+- All key usage logged in CloudTrail
+
+### 5. Implementation Steps
+
+#### Phase 1: Key Creation (Week 2)
+- [ ] **Step 1.1:** Create CMK for dev environment
+- [ ] **Step 1.2:** Create CMK for uat environment
+- [ ] **Step 1.3:** Create CMK for prod environment
+- [ ] **Step 1.4:** Configure key aliases
+
+#### Phase 2: Key Policies (Week 2-3)
+- [ ] **Step 2.1:** Define key administrator policy
+- [ ] **Step 2.2:** Define key user policy
+- [ ] **Step 2.3:** Grant service principals access
+- [ ] **Step 2.4:** Configure audit logging
+
+#### Phase 3: Service Integration (Week 3)
+- [ ] **Step 3.1:** Configure S3 bucket encryption with KMS
+- [ ] **Step 3.2:** Configure Glue Catalog encryption
+- [ ] **Step 3.3:** Configure SageMaker encryption
+- [ ] **Step 3.4:** Configure CloudWatch Logs encryption
+
+#### Phase 4: Rotation & Validation (Week 3-4)
+- [ ] **Step 4.1:** Enable automatic key rotation
+- [ ] **Step 4.2:** Test decryption after rotation
+- [ ] **Step 4.3:** Verify all data encrypted at rest
+- [ ] **Step 4.4:** Test TLS in transit (TLS 1.2+)
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| AWS account with KMS access | Infrastructure | Required |
+| IAM roles for key administration | Shared Infrastructure | Required |

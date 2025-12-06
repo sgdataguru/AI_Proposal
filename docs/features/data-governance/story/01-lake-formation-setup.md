@@ -130,3 +130,119 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **AWS Glue Data Catalog** for metadata management and classification tags
 - **AWS IAM** for role-based access control
 - **AWS CloudTrail** for audit logging of all access attempts
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Configure AWS Lake Formation with fine-grained access controls to ensure data access is governed at table and column level, with users accessing only authorized data.
+
+**Primary User Role:** Platform Administrator
+
+**Business Value:** Enables 100% tables under governance control with zero unauthorized access incidents. Foundational for regulatory compliance and data trust.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| S3 Data Lake | Data Platform Story 01 | **REUSE** - Register locations |
+| Glue Catalog | Data Platform Story 02 | **INTEGRATE** - Permission source |
+| IAM Roles | Shared Infrastructure | **REUSE** - Permission principals |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Lake Formation Admin Config | Administrator setup | High |
+| Permission Grants | Role-based table access | High |
+| Column-Level Security | PII protection | High |
+| Data Masking Rules | Non-prod PII masking | Medium |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/lake-formation/main.tf` | [CREATE] | Lake Formation module |
+| `infra/modules/lake-formation/variables.tf` | [CREATE] | Module variables |
+| `infra/modules/lake-formation/permissions.tf` | [CREATE] | Permission grants |
+| `infra/modules/lake-formation/data-locations.tf` | [CREATE] | S3 registrations |
+| `infra/components/governance/lake-formation.tf` | [CREATE] | Governance component |
+
+#### Documentation
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `docs/governance/access-control-guide.md` | [CREATE] | Access control documentation |
+| `docs/governance/permission-matrix.md` | [CREATE] | Role permission matrix |
+
+### 4. Component Breakdown
+
+#### 4.1 Permission Matrix
+
+| Principal | raw_db | curated_db | analytics_db | features_db |
+|-----------|--------|------------|--------------|-------------|
+| DataEngineerRole | ALL | ALL | ALL | ALL |
+| DataScientistRole | - | SELECT | SELECT | SELECT |
+| AnalystRole | - | - | SELECT (non-PII) | - |
+| ServiceRole | - | - | SELECT (lead_scores) | - |
+
+#### 4.2 Column-Level Security
+
+```hcl
+# Column-level permissions for PII protection
+resource "aws_lakeformation_permissions" "analyst_analytics_no_pii" {
+  principal = aws_iam_role.analyst.arn
+  
+  permissions = ["SELECT"]
+  
+  table_with_columns {
+    database_name = "analytics_db"
+    name          = "lead_scores"
+    
+    # Exclude PII columns
+    excluded_column_names = [
+      "contact_email",
+      "contact_phone",
+      "first_name",
+      "last_name"
+    ]
+  }
+}
+```
+
+### 5. Implementation Steps
+
+#### Phase 1: Lake Formation Setup (Week 3)
+- [ ] **Step 1.1:** Enable Lake Formation on AWS account
+- [ ] **Step 1.2:** Register S3 data locations
+- [ ] **Step 1.3:** Configure Lake Formation administrators
+- [ ] **Step 1.4:** Set up audit logging
+
+#### Phase 2: Permission Configuration (Week 3-4)
+- [ ] **Step 2.1:** Create permission grants for DataEngineerRole
+- [ ] **Step 2.2:** Create permission grants for DataScientistRole
+- [ ] **Step 2.3:** Create permission grants for AnalystRole
+- [ ] **Step 2.4:** Create permission grants for ServiceRole
+
+#### Phase 3: Column-Level Security (Week 4)
+- [ ] **Step 3.1:** Tag PII columns in Glue Catalog
+- [ ] **Step 3.2:** Configure column-level permissions
+- [ ] **Step 3.3:** Set up data masking for non-prod
+- [ ] **Step 3.4:** Test PII access restrictions
+
+#### Phase 4: Validation (Week 4)
+- [ ] **Step 4.1:** Test access for each role type
+- [ ] **Step 4.2:** Verify denied access returns proper errors
+- [ ] **Step 4.3:** Validate audit logging captures access attempts
+- [ ] **Step 4.4:** Confirm ETL jobs function with new permissions
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| S3 Data Lake Foundation | Data Platform Story 01 | Required |
+| Glue Data Catalog | Data Platform Story 02 | Required |
+| IAM roles defined | Shared Infrastructure | Required |
+| Data classification completed | Business | Required |

@@ -124,3 +124,185 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **Amazon MWAA / Step Functions** for workflow orchestration
 - **Amazon CloudWatch** for pipeline monitoring and SLA tracking
 - **Amazon S3** for score output storage (Gold zone)
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Generate lead scores automatically on a daily basis so that RMs and inside sales teams have fresh prioritization data every morning to guide their outreach activities.
+
+**Primary User Role:** Operations Manager
+
+**Business Value:** Delivers automated daily scoring by 6 AM with >99% pipeline success rate, directly enabling RM productivity gains of 20-30% more leads processed per day.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| Feature Store | Lead Scoring Story 03 | **REUSE** - Scoring input |
+| Trained Model | Lead Scoring Story 04 | **REUSE** - Model artifact |
+| MWAA | Data Platform Story 04 | **REUSE** - Orchestration |
+| Model Registry | Data Governance Story 03 | **REUSE** - Model retrieval |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| Batch Transform Config | SageMaker configuration | High |
+| Score Validation Job | Anomaly detection | High |
+| Score Output Formatter | Standard output schema | High |
+| SLA Monitoring | Pipeline timing alerts | Medium |
+
+### 3. Affected Files
+
+#### ML Code
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/ml/scoring/batch_transform_config.py` | [CREATE] | Transform configuration |
+| `src/ml/scoring/score_formatter.py` | [CREATE] | Output formatting |
+| `src/ml/scoring/score_validator.py` | [CREATE] | Score validation |
+| `src/ml/scoring/driver_extractor.py` | [CREATE] | Top driver extraction |
+
+#### Infrastructure
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/components/ml/batch_transform.tf` | [CREATE] | Batch Transform config |
+
+#### Airflow DAGs
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `src/airflow/dags/ml_scoring_dag.py` | [MODIFY] | Add scoring tasks |
+
+#### Tests
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `tests/scoring/test_batch_transform.py` | [CREATE] | Transform tests |
+| `tests/scoring/test_score_validator.py` | [CREATE] | Validation tests |
+
+### 4. Component Breakdown
+
+#### 4.1 Score Output Schema
+
+```json
+{
+  "output_path": "s3://bucket/analytics/lead_scores/score_date={date}/model_version={version}/",
+  "schema": {
+    "lead_id": "string",
+    "score_value": "double",
+    "score_band": "string",
+    "top_drivers": [
+      {"feature": "string", "contribution": "double"}
+    ],
+    "model_version": "string",
+    "score_timestamp": "timestamp"
+  }
+}
+```
+
+#### 4.2 Score Validator
+
+```python
+# src/ml/scoring/score_validator.py
+"""
+Score Validation Module
+Detects anomalies in score distributions.
+"""
+
+class ScoreValidator:
+    """Validates batch scoring output."""
+    
+    def __init__(self, config: dict):
+        self.config = config
+        self.baseline_stats = self.load_baseline_stats()
+        
+    def validate_distribution(self, scores_df: DataFrame) -> dict:
+        """Validate score distribution against baseline."""
+        current_stats = {
+            'mean': scores_df['score_value'].mean(),
+            'std': scores_df['score_value'].std(),
+            'hot_pct': (scores_df['score_band'] == 'Hot').mean(),
+            'warm_pct': (scores_df['score_band'] == 'Warm').mean(),
+            'cold_pct': (scores_df['score_band'] == 'Cold').mean(),
+        }
+        
+        # Check for anomalies
+        anomalies = []
+        if abs(current_stats['mean'] - self.baseline_stats['mean']) > 0.1:
+            anomalies.append('mean_shift')
+        if current_stats['hot_pct'] > self.baseline_stats['hot_pct'] * 1.5:
+            anomalies.append('hot_band_spike')
+            
+        return {
+            'valid': len(anomalies) == 0,
+            'anomalies': anomalies,
+            'current_stats': current_stats
+        }
+```
+
+### 5. Data Flow & Pipeline Architecture
+
+```mermaid
+sequenceDiagram
+    participant AIRFLOW as Airflow
+    participant FEAT as Feature Store
+    participant SM as SageMaker
+    participant MODEL as Model Registry
+    participant S3 as S3 Gold
+    participant VALID as Score Validator
+    participant CW as CloudWatch
+    
+    Note over AIRFLOW,CW: Daily Scoring Pipeline (3-6 AM)
+    
+    AIRFLOW->>FEAT: Get latest features
+    AIRFLOW->>MODEL: Get approved model version
+    MODEL-->>AIRFLOW: Return model ARN
+    AIRFLOW->>SM: Start Batch Transform
+    SM->>FEAT: Read features
+    SM->>SM: Run inference
+    SM->>S3: Write scores
+    S3->>VALID: Trigger validation
+    VALID->>VALID: Check distribution
+    VALID->>CW: Log metrics
+    VALID-->>AIRFLOW: Validation result
+```
+
+### 6. Testing Strategy
+
+| Test Type | Test Description | Expected Outcome |
+|-----------|------------------|------------------|
+| Unit Test | Score formatting | Correct schema |
+| Unit Test | Anomaly detection | Catches distribution shifts |
+| Integration Test | End-to-end scoring | All leads scored |
+| Performance Test | 1M+ leads | <1 hour processing |
+| SLA Test | Complete by 6 AM | >95% SLA adherence |
+
+### 7. Implementation Steps
+
+#### Phase 1: Pipeline Development (Week 8)
+- [ ] **Step 1.1:** Create SageMaker Batch Transform configuration
+- [ ] **Step 1.2:** Implement feature retrieval for active leads
+- [ ] **Step 1.3:** Configure model version retrieval from registry
+- [ ] **Step 1.4:** Set up score output formatting
+
+#### Phase 2: Quality Assurance (Week 8-9)
+- [ ] **Step 2.1:** Implement score distribution validation
+- [ ] **Step 2.2:** Create anomaly detection rules
+- [ ] **Step 2.3:** Set up score statistics logging
+- [ ] **Step 2.4:** Configure alerts for distribution anomalies
+
+#### Phase 3: Orchestration & Monitoring (Week 9)
+- [ ] **Step 3.1:** Create Airflow DAG for scoring pipeline
+- [ ] **Step 3.2:** Configure dependencies on feature engineering
+- [ ] **Step 3.3:** Set up SLA monitoring (6 AM deadline)
+- [ ] **Step 3.4:** Create status notification workflow
+
+### 8. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| Feature Engineering Pipeline | Lead Scoring Story 03 | Required |
+| Model Training Pipeline | Lead Scoring Story 04 | Required |
+| Approved model in Registry | Data Governance Story 03 | Required |
+| Airflow orchestration | Data Platform Story 04 | Required |

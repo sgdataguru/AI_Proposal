@@ -143,3 +143,116 @@ Per [Tech Stack](../../../project-context/tech-stack.md):
 - **VPC Flow Logs** for network traffic monitoring
 - **AWS Network ACLs** for additional traffic filtering
 - **Terraform** for infrastructure as code
+
+---
+
+## Implementation Plan
+
+### 1. Feature Overview
+
+**Goal:** Configure VPC with private subnets and VPC endpoints so all data platform components operate in network isolation without public internet exposure.
+
+**Primary User Role:** Security Engineer
+
+**Business Value:** Ensures zero public exposure for data workloads with 100% VPC traffic logged, meeting financial services security requirements.
+
+### 2. Component Analysis & Reuse Strategy
+
+#### Existing Components
+| Component | Location | Reuse Decision |
+|-----------|----------|----------------|
+| AWS Account | Infrastructure | **REUSE** - VPC target |
+
+#### New Components Required
+| Component | Purpose | Priority |
+|-----------|---------|----------|
+| VPC | Network foundation | Critical |
+| Subnets | Public/Private separation | Critical |
+| VPC Endpoints | Private AWS access | High |
+| Security Groups | Resource-level security | High |
+| Flow Logs | Traffic monitoring | High |
+
+### 3. Affected Files
+
+#### Infrastructure (Terraform)
+| File Path | Action | Description |
+|-----------|--------|-------------|
+| `infra/modules/vpc/main.tf` | [CREATE] | VPC module |
+| `infra/modules/vpc/subnets.tf` | [CREATE] | Subnet configuration |
+| `infra/modules/vpc/endpoints.tf` | [CREATE] | VPC endpoints |
+| `infra/modules/vpc/security-groups.tf` | [CREATE] | Security groups |
+| `infra/modules/vpc/flow-logs.tf` | [CREATE] | Flow log configuration |
+| `infra/components/networking/main.tf` | [CREATE] | Networking component |
+
+### 4. Component Breakdown
+
+#### 4.1 VPC Architecture
+
+```
+VPC CIDR: 10.0.0.0/16
+├── Public Subnets (NAT Gateway only)
+│   ├── 10.0.1.0/24 (AZ-a)
+│   └── 10.0.2.0/24 (AZ-b)
+├── Private Subnets (Workloads)
+│   ├── 10.0.10.0/24 (AZ-a)
+│   └── 10.0.11.0/24 (AZ-b)
+└── Isolated Subnets (Future: Databases)
+    ├── 10.0.20.0/24 (AZ-a)
+    └── 10.0.21.0/24 (AZ-b)
+```
+
+#### 4.2 VPC Endpoints
+
+| Endpoint | Type | Purpose |
+|----------|------|---------|
+| S3 | Gateway | Data lake access |
+| Glue | Interface | ETL jobs |
+| SageMaker | Interface | ML workloads |
+| KMS | Interface | Encryption |
+| Secrets Manager | Interface | Credentials |
+| CloudWatch Logs | Interface | Logging |
+| ECR | Interface | Container images |
+
+#### 4.3 Security Groups
+
+| Security Group | Purpose | Inbound | Outbound |
+|----------------|---------|---------|----------|
+| sg-glue | Glue jobs | Self-reference | HTTPS to endpoints |
+| sg-sagemaker | SageMaker | Self-reference | HTTPS to endpoints |
+| sg-lambda | Lambda | None | HTTPS only |
+| sg-endpoints | VPC endpoints | HTTPS from private | None |
+
+### 5. Implementation Steps
+
+#### Phase 1: VPC Setup (Week 2)
+- [ ] **Step 1.1:** Create VPC with CIDR block
+- [ ] **Step 1.2:** Create public and private subnets across AZs
+- [ ] **Step 1.3:** Configure NAT Gateway in public subnet
+- [ ] **Step 1.4:** Set up route tables
+
+#### Phase 2: VPC Endpoints (Week 2-3)
+- [ ] **Step 2.1:** Create S3 gateway endpoint
+- [ ] **Step 2.2:** Create Glue interface endpoint
+- [ ] **Step 2.3:** Create SageMaker endpoints
+- [ ] **Step 2.4:** Create KMS and Secrets Manager endpoints
+- [ ] **Step 2.5:** Create CloudWatch Logs endpoint
+
+#### Phase 3: Security Configuration (Week 3)
+- [ ] **Step 3.1:** Create and configure sg-glue
+- [ ] **Step 3.2:** Create and configure sg-sagemaker
+- [ ] **Step 3.3:** Create and configure sg-lambda
+- [ ] **Step 3.4:** Configure Network ACLs
+- [ ] **Step 3.5:** Enable VPC Flow Logs
+
+#### Phase 4: Validation (Week 3-4)
+- [ ] **Step 4.1:** Test Glue job connectivity via endpoints
+- [ ] **Step 4.2:** Test SageMaker connectivity
+- [ ] **Step 4.3:** Verify no public internet access
+- [ ] **Step 4.4:** Validate VPC Flow Logs capture traffic
+
+### 6. Dependencies & Prerequisites
+
+| Dependency | Source | Status |
+|------------|--------|--------|
+| AWS account provisioned | Infrastructure | Required |
+| IP address allocation | Network team | Required |
