@@ -218,6 +218,14 @@ The implementation must:
 - ✅ Edge cases handled according to design guidelines
 ```
 
+### Isolated Verification
+During development, you MUST:
+- Generate quick, small tests that can be run to ensure a method works as intended
+- Include sufficient documentation of the quick test for your own future reference and lookup
+- Save these quick tests to `agent-utils/dev-testing/`
+- Organize tests by type: `pipelines/`, `dbt/`, `api/`, `infrastructure/`, `utils/`
+- Follow the guidelines in `agent-utils/dev-testing/README.md`
+
 ### Functionality Verification (For Integration Tasks)
 
 ```markdown
