@@ -1,7 +1,7 @@
 # Risk & Constraint Register
 
 **Document Owner:** Program Management / Risk Office  
-**Last Updated:** December 2024  
+**Last Updated:** December 2025  
 **Status:** Active  
 **Review Frequency:** Monthly (risks), Quarterly (assumptions/constraints)  
 **Related Documents:** [Data Platform Strategy](./data-platform-strategy.md) | [Value Delivery Roadmap](./value-delivery-roadmap.md)
