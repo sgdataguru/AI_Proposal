@@ -1,11 +1,11 @@
 ---
-# Fill in the fields below to create a high-standard custom agent for your repository.
+# High-standard custom agent configuration + template
 # You can test locally with the Copilot CLI: https://gh.io/customagents/cli
 # To publish this agent, merge this file into the default branch.
 # Format reference: https://gh.io/customagents/config
 
-name:
-description:
+name: High-Standard Repo Research & Delivery Agent
+description: A governance-minded engineering assistant that researches repository context, validates assumptions, and produces implementation plans, test strategies, and risk-aware recommendations with production-quality standards.
 ---
 
 # Agent Overview
