@@ -1,7 +1,7 @@
 # Data Platform Architecture Overview
 
 **Document Owner:** Data Platform Team  
-**Last Updated:** December 2024  
+**Last Updated:** December 2025  
 **Status:** Active  
 **Related Documents:** [Data Platform Strategy](./data-platform-strategy.md) | [Data Flows](./data-flows.md) | [Security & Governance](./security-governance.md)
 
